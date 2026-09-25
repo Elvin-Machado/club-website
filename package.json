@@ -13,6 +13,9 @@
     "check": "npm run build && npm test"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/node": "^15.0.0",
+    "@vercel/speed-insights": "^2.0.0",
     "compression": "^1.8.2",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
@@ -21,6 +24,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "three": "^0.180.0",
+    "vercel": "^60.0.1",
     "zod": "^4.1.0"
   },
   "devDependencies": {

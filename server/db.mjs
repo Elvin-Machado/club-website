@@ -13,7 +13,7 @@ export function verifyPassword(password, stored) {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
-export function openDatabase(path = process.env.DATABASE_PATH || './data/nucleus.sqlite') {
+export function openDatabase(path = process.env.DATABASE_PATH || (process.env.VERCEL ? '/tmp/nucleus.sqlite' : './data/nucleus.sqlite')) {
   if (path !== ':memory:') mkdirSync(dirname(resolve(path)), { recursive: true });
   const db = new DatabaseSync(path);
   db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;
