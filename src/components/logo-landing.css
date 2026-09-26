@@ -1,0 +1,61 @@
+.logo-landing {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+  color: var(--mint);
+}
+
+.logo-landing__scene {
+  position: absolute;
+  inset: 0;
+}
+
+.logo-landing__scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.logo-landing[data-status='ready'] canvas {
+  opacity: 1;
+}
+
+.logo-landing__fallback {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(560px, 70vw, 67.7vh);
+  width: min(560px, 70vw, 67.7dvh);
+  height: auto;
+  aspect-ratio: 672 / 625;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  animation: logo-fallback-in 600ms ease 1.5s forwards;
+}
+
+.logo-landing[data-status='ready'] .logo-landing__fallback {
+  display: none;
+}
+
+.logo-landing[data-status='still'] .logo-landing__fallback,
+.logo-landing[data-status='fallback'] .logo-landing__fallback {
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes logo-fallback-in {
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-landing__fallback {
+    opacity: 1;
+    animation: none;
+  }
+}

@@ -21,7 +21,14 @@
   </head>
   <body>
     <div id="root"></div>
-    <noscript><main style="font-family:system-ui;padding:3rem;max-width:50rem;margin:auto"><h1>Nucleus — SJEC</h1><p>The student innovation community at St. Joseph Engineering College, Mangaluru. Our domains are Artificial Intelligence & Machine Learning, Web Development, and Data Structures & Algorithms.</p><p>Enable JavaScript to explore events and apply. You can also <a href="mailto:nucleussjec@gmail.com">contact Nucleus by email</a> or visit <a href="https://www.instagram.com/nucleus_sjec/">our Instagram</a>.</p></main></noscript>
+    <noscript>
+      <style>#root:not(:empty) ~ noscript { display: none; }</style>
+      <main class="logo-landing" aria-label="Nucleus">
+        <svg class="logo-landing__fallback" viewBox="430 128 672 625" role="img" aria-label="Nucleus logo">
+          <image href="./NucleusLogo_transparent.png" width="1599" height="899" />
+        </svg>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

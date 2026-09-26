@@ -112,13 +112,16 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
   if (existsSync(resolve(dist, 'index.html'))) {
     app.use('/assets', express.static(resolve(dist, 'assets'), { immutable: true, maxAge: '1y' }));
     app.use(express.static(dist, { index: false, maxAge: '1h' }));
-    app.get(['/', '/admin', '/admin/'], (req, res) => {
+    app.use((req, res, next) => {
+      if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+      if (req.path.startsWith('/api') || req.path.startsWith('/assets')) return next();
+      if (!['/', '/about', '/events', '/projects', '/team'].includes(req.path.replace(/\/$/, '') || '/') && !/^\/admin(?:\/|$)/.test(req.path)) return next();
       let html = readFileSync(resolve(dist, 'index.html'), 'utf8');
       if (req.path.startsWith('/admin')) html = html.replace('</head>', '<meta name="robots" content="noindex,nofollow"></head>').replace('Nucleus — Where curious minds connect | SJEC', 'Control room | Nucleus');
       else if (render) {
         const data = getSite(db);
         const safeData = JSON.stringify(data).replace(/</g, '\\u003c');
-        html = html.replace('<div id="root"></div>', () => `<div id="root">${render(data)}</div><script id="nucleus-data" type="application/json">${safeData}</script>`);
+        html = html.replace('<div id="root"></div>', () => `<div id="root">${render(data, req.originalUrl)}</div><script id="nucleus-data" type="application/json">${safeData}</script>`);
         const organization = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Nucleus SJEC', url: origin || 'https://nucleussjec.in', logo: `${origin || 'https://nucleussjec.in'}/brain-mark.svg`, email: data.settings.contactEmail, sameAs: [data.settings.instagramUrl, data.settings.githubUrl, data.settings.linkedinUrl].filter(Boolean), parentOrganization: { '@type': 'CollegeOrUniversity', name: 'St. Joseph Engineering College', address: { '@type': 'PostalAddress', addressLocality: 'Mangaluru', addressCountry: 'IN' } } };
         html = html.replace('</head>', () => `<script type="application/ld+json">${JSON.stringify(organization).replace(/</g, '\\u003c')}</script></head>`);
       }
