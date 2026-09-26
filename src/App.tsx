@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowUpRight, ArrowRight, ArrowDown, Menu, X, BrainCircuit, Code2, Network, Github, Instagram, Linkedin, Mail, Check, Sparkles, LoaderCircle, Plus, Minus, ChevronRight } from 'lucide-react';
 import { Intro, Logo } from './components/Logo';
 import Modal from './components/Modal';
@@ -6,6 +6,7 @@ import { api } from './api';
 import type { SiteData, SiteSettings } from './types';
 import seed from '../shared/public-data.json';
 import EventExplorer from './components/EventExplorer';
+import TeamPage from './Team';
 
 const domains = [
   { id: 'aiml', num: '01', title: 'Artificial Intelligence', subtitle: '& Machine Learning', icon: BrainCircuit, tags: ['Intelligence', 'Research', 'Possibility'], description: 'From a first model to the next big question. Explore the systems that learn, adapt, and open up entirely new possibilities.', detail: 'Explore model building, machine learning foundations, research papers, and practical AI applications. Bring your curiosity; build your understanding through collaborative experiments.' },
@@ -38,10 +39,22 @@ function ApplyForm({ settings, online, onClose }: { settings: SiteSettings; onli
   </Modal>;
 }
 
-export default function App({ initialData = seed }: { initialData?: SiteData }) {
+export default function App({ initialData = seed, pathname = '/' }: { initialData?: SiteData; pathname?: string }) {
+  const isTeamPage = /^\/team\/?$/.test(pathname);
+  const homeLink = (hash: string) => isTeamPage ? `/${hash}` : hash;
   const [data, setData] = useState<SiteData>(initialData), [online, setOnline] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false), [applyOpen, setApplyOpen] = useState(false);
-  const [domain, setDomain] = useState<number | null>(null), [teamExpanded, setTeamExpanded] = useState(false), [faq, setFaq] = useState<number | null>(0);
+  const [domain, setDomain] = useState<number | null>(null), [faq, setFaq] = useState<number | null>(0);
+  useEffect(() => {
+    if (!isTeamPage) return;
+    document.title = 'The team | Nucleus SJEC';
+    const description = 'Meet the core team and members of Nucleus, the student innovation community at St. Joseph Engineering College, Mangaluru.';
+    document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', 'https://nucleussjec.in/team');
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', 'https://nucleussjec.in/team');
+    for (const selector of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) document.querySelector(selector)?.setAttribute('content', 'The team | Nucleus SJEC');
+    for (const selector of ['meta[property="og:description"]', 'meta[name="twitter:description"]']) document.querySelector(selector)?.setAttribute('content', description);
+  }, [isTeamPage]);
   useEffect(() => {
     const abort = new AbortController();
     api<SiteData>('/site', { signal: abort.signal }).then(site => { setData(site); setOnline(true); }).catch(error => { if (error.name !== 'AbortError') setOnline(false); });
@@ -61,12 +74,16 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
   return <>
     <Intro />
     <a href="#main-content" className="skip-link">Skip to content</a>
-    <header className="site-header"><a className="brand" href="#home" aria-label="Nucleus home"><Logo /><span>NUCLEUS<small>SJEC · MANGALURU</small></span></a>
-      <nav className={menuOpen ? 'navigation open' : 'navigation'} aria-label="Main navigation">{[['The idea', '#about'], ['Experiences', '#events'], ['Our work', '#projects'], ['The people', '#team']].map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}</nav>
+    <header className="site-header"><a className="brand" href={homeLink('#home')} aria-label="Nucleus home"><Logo /><span>NUCLEUS<small>SJEC · MANGALURU</small></span></a>
+      <nav className={menuOpen ? 'navigation open' : 'navigation'} aria-label="Main navigation">{[['The idea', homeLink('#about')], ['Experiences', homeLink('#events')], ['Our work', homeLink('#projects')], ['The team', '/team']].map(([label, href]) => <a key={href} href={href} aria-current={isTeamPage && href === '/team' ? 'page' : undefined} onClick={() => setMenuOpen(false)}>{label}</a>)}</nav>
       <button className="button header-cta" onClick={() => setApplyOpen(true)}>{settings.recruitmentOpen ? 'Join Nucleus' : 'Stay connected'}<ArrowUpRight size={16} /></button>
       <button className="icon-button menu-toggle" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
     </header>
     <main id="main-content">
+      {isTeamPage ? <>
+        {!online && <div className="connection-banner" role="status">You’re viewing saved club information. Live updates are temporarily unavailable. <button onClick={() => window.location.reload()}>Try again</button></div>}
+        <TeamPage team={data.team} onJoin={() => setApplyOpen(true)} />
+      </> : <>
       <section className="hero section-wrap" id="home">
         <div className="hero-grid" aria-hidden="true" />
         <div className="hero-copy"><div className="eyebrow hero-eyebrow"><span className="status-dot" /> MANY MINDS. ONE NUCLEUS.</div>
@@ -94,12 +111,13 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
         {!data.projects.length && <div className="empty-state">The next project is taking shape. Follow our GitHub for updates.</div>}
       </section>
       <section className="team-section section-wrap section-space" id="team"><div className="section-heading"><span className="eyebrow"><span className="section-number">04</span> THE PEOPLE</span><span className="section-side-note">INDIVIDUALLY CURIOUS.<br />COLLECTIVELY NUCLEUS.</span></div><div className="split-heading"><h2>The minds<br /><em>behind the spark.</em></h2><p>Students, collaborators, and your next teammates.<br />Meet the people making it happen.</p></div>
-        <div className="team-grid">{data.team.slice(0, teamExpanded ? undefined : 6).map((member, index) => <article className="member-card" key={member.id}><span className={`member-avatar avatar-${index % 3}`} aria-hidden="true">{member.initials}<span>✳</span></span><div><h3>{member.name}</h3><p>{member.role}</p></div><span className="member-number">{String(index + 1).padStart(2, '0')}</span></article>)}</div>{data.team.length > 6 && <button className="button outline team-expand" onClick={() => setTeamExpanded(!teamExpanded)} aria-expanded={teamExpanded}>{teamExpanded ? 'Show less' : `Meet all ${data.team.length} minds`}{teamExpanded ? <Minus size={17} /> : <Plus size={17} />}</button>}
+        <div className="team-grid">{data.team.slice(0, 6).map((member, index) => <article className="member-card" key={member.id}><span className={`member-avatar avatar-${index % 3}`} aria-hidden="true">{member.initials}<span>✳</span></span><div><h3>{member.name}</h3><p>{member.role}</p></div><span className="member-number">{String(index + 1).padStart(2, '0')}</span></article>)}</div><a className="button outline team-expand" href="/team">Meet all {data.team.length} minds <ArrowUpRight size={17} /></a>
       </section>
       <section className="faq-section section-wrap section-space"><div><span className="eyebrow"><span className="section-number">05</span> STILL CURIOUS?</span><h2>Good questions.<br /><em>Start here.</em></h2><a className="text-link" href={`mailto:${settings.contactEmail}`}>Ask us something else <ArrowUpRight size={17} /></a></div><div className="faq-list">{faqs.map(([q, a], i) => <div className={`faq-item ${faq === i ? 'expanded' : ''}`} key={q}><h3><button aria-expanded={faq === i} aria-controls={`faq-${i}`} onClick={() => setFaq(faq === i ? null : i)}><span>{q}</span>{faq === i ? <Minus size={18} /> : <Plus size={18} />}</button></h3><div id={`faq-${i}`} hidden={faq !== i}><p>{a}</p></div></div>)}</div></section>
       <section className="join-section section-wrap"><div className="join-orbit" aria-hidden="true" /><span className="eyebrow"><span className="status-dot" /> YOUR NEXT CHAPTER</span><h2>There’s room for<br /><em>your kind of curious.</em></h2><p>You don’t need to have it all figured out.<br />Just bring an idea. Or a question. Or yourself.</p><button className="button primary" onClick={() => setApplyOpen(true)}>{settings.recruitmentOpen ? 'Find your place at Nucleus' : 'Connect with Nucleus'}<ArrowUpRight size={20} /></button><span className="join-status">{settings.recruitmentOpen ? `Applications open · ${settings.cycle} intake` : 'Follow along for the next intake'}</span></section>
+      </>}
     </main>
-    <footer className="site-footer section-wrap" id="contact"><div className="footer-top"><a className="brand" href="#home"><Logo /><span>NUCLEUS<small>A CONNECTION WORTH MAKING.</small></span></a><div className="footer-socials"><a href={settings.instagramUrl} target="_blank" rel="noreferrer" aria-label="Nucleus Instagram"><Instagram size={19} /></a><a href={settings.linkedinUrl} target="_blank" rel="noreferrer" aria-label="Nucleus LinkedIn"><Linkedin size={19} /></a><a href={settings.githubUrl} target="_blank" rel="noreferrer" aria-label="Nucleus GitHub"><Github size={19} /></a><a href={`mailto:${settings.contactEmail}`} aria-label="Email Nucleus"><Mail size={19} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Nucleus SJEC</span><span>Mangaluru, India · Made of many minds.</span><a href="#home">Back to the beginning <ArrowUpRight size={14} /></a></div><div className="footer-word" aria-hidden="true">NUCLEUS<span>✳</span></div></footer>
+    <footer className="site-footer section-wrap" id="contact"><div className="footer-top"><a className="brand" href={homeLink('#home')}><Logo /><span>NUCLEUS<small>A CONNECTION WORTH MAKING.</small></span></a><div className="footer-socials"><a href={settings.instagramUrl} target="_blank" rel="noreferrer" aria-label="Nucleus Instagram"><Instagram size={19} /></a><a href={settings.linkedinUrl} target="_blank" rel="noreferrer" aria-label="Nucleus LinkedIn"><Linkedin size={19} /></a><a href={settings.githubUrl} target="_blank" rel="noreferrer" aria-label="Nucleus GitHub"><Github size={19} /></a><a href={`mailto:${settings.contactEmail}`} aria-label="Email Nucleus"><Mail size={19} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Nucleus SJEC</span><span>Mangaluru, India · Made of many minds.</span><a href={homeLink('#home')}>Back to the beginning <ArrowUpRight size={14} /></a></div><div className="footer-word" aria-hidden="true">NUCLEUS<span>✳</span></div></footer>
     {applyOpen && <ApplyForm settings={settings} online={online} onClose={() => setApplyOpen(false)} />}
     {domain !== null && <Modal title={`${domains[domain].title} ${domains[domain].subtitle}`} onClose={() => setDomain(null)}><p className="modal-lead">{domains[domain].detail}</p><div className="domain-tags">{domains[domain].tags.map(tag => <span key={tag}>{tag}</span>)}</div><button className="button primary" onClick={() => { setDomain(null); setApplyOpen(true); }}>Find your next connection <ArrowUpRight size={17} /></button></Modal>}
   </>;

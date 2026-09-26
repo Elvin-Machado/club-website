@@ -52,6 +52,14 @@ The Three.js renderer is loaded only near the event section. The scene includes 
 
 No audio, game telemetry, or external graphics service is required. The scene disposes GPU resources on unmount, caps pixel density, and suspends rendering offscreen or in a hidden browser tab.
 
+## The team page
+
+Open `/team` from **The team** in the navigation or from the homepage team preview. The page preserves the site's React / TypeScript stack and navy, mint, and serif styling. GSAP ScrollTrigger moves through the 12 core roles in order; a deferred Three.js orbit illustrates the team introduction. Role shortcuts and previous/next controls provide direct navigation. Members appear afterwards in a normal card grid with introductions in accessible dialogs.
+
+Use **Read as a list** for a standard layout. Reduced-motion preferences and short viewports automatically use the list. Without JavaScript, the production server renders every core role and member card. WebGL failure leaves the static orbit illustration in place.
+
+The roster still comes from `/api/site`. In the admin dashboard, **Team → Edit → Introduction** saves an optional biography for either a lead or a member. Existing records need no migration: missing biographies use role or community introductions, and initials stand in for portraits. Add a person with the role **System Design Lead** to fill that currently unassigned card. The existing Event Lead is preserved in the members grid. No names or personal achievements have been invented.
+
 ## Backend and data
 
 The default database is `data/nucleus.sqlite`, with SQLite WAL enabled. It is seeded once from `shared/public-data.json`; restarting the server preserves edits. The seed uses the existing club's public events, leadership, project, and closed recruitment status. Review dates and copy in the dashboard before launch.

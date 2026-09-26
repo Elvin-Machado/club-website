@@ -19,6 +19,7 @@
     "compression": "^1.8.2",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
+    "gsap": "^3.15.0",
     "helmet": "^8.1.0",
     "lucide-react": "^0.468.0",
     "react": "^19.1.0",
@@ -28,6 +29,7 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.63.5",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@types/three": "^0.180.0",

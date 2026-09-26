@@ -12,7 +12,7 @@ const safeUrl = z.union([z.literal(''), z.url().refine(value => ['https:', 'http
 const isoDate = z.union([z.literal(''), z.iso.datetime({ offset: true })]);
 const eventSchema = z.object({ title: z.string().trim().min(2).max(120), description: z.string().trim().min(20).max(1600), startsAt: z.iso.datetime({ offset: true }), endsAt: isoDate, location: z.string().trim().min(2).max(200), category: z.string().trim().min(2).max(60), registrationUrl: safeUrl, published: z.boolean() }).refine(e => !e.endsAt || new Date(e.endsAt) >= new Date(e.startsAt), 'End date must follow the start date');
 const projectSchema = z.object({ title: z.string().trim().min(2).max(120), description: z.string().trim().min(20).max(1600), domain: z.string().trim().min(2).max(60), status: z.string().trim().min(2).max(60), url: safeUrl, repositoryUrl: safeUrl, published: z.boolean() });
-const memberSchema = z.object({ name: z.string().trim().min(2).max(100), role: z.string().trim().min(2).max(100), initials: z.string().trim().min(1).max(4) });
+const memberSchema = z.object({ name: z.string().trim().min(2).max(100), role: z.string().trim().min(2).max(100), initials: z.string().trim().min(1).max(4), bio: z.string().trim().max(1600).optional() });
 const settingsSchema = z.object({ recruitmentOpen: z.boolean(), recruitmentMessage: z.string().trim().min(10).max(600), recruitmentDeadline: isoDate, cycle: z.string().trim().min(1).max(50), contactEmail: z.email().max(254), instagramUrl: safeUrl, githubUrl: safeUrl, linkedinUrl: safeUrl });
 const applicationSchema = z.object({ name: z.string().trim().min(2).max(100), email: z.email().max(254).transform(e => e.toLowerCase()), year: z.enum(['1', '2', '3', '4']), domain: z.enum(['aiml', 'web', 'dsa']), motivation: z.string().trim().min(30).max(1600), portfolio: safeUrl, consent: z.literal(true), website: z.literal('').optional() });
 const hashToken = token => createHash('sha256').update(token).digest('hex');
@@ -112,15 +112,23 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
   if (existsSync(resolve(dist, 'index.html'))) {
     app.use('/assets', express.static(resolve(dist, 'assets'), { immutable: true, maxAge: '1y' }));
     app.use(express.static(dist, { index: false, maxAge: '1h' }));
-    app.get(['/', '/admin', '/admin/'], (req, res) => {
+    app.get(['/', '/team', '/team/', '/admin', '/admin/'], (req, res) => {
       let html = readFileSync(resolve(dist, 'index.html'), 'utf8');
       if (req.path.startsWith('/admin')) html = html.replace('</head>', '<meta name="robots" content="noindex,nofollow"></head>').replace('Nucleus — Where curious minds connect | SJEC', 'Control room | Nucleus');
       else if (render) {
         const data = getSite(db);
         const safeData = JSON.stringify(data).replace(/</g, '\\u003c');
-        html = html.replace('<div id="root"></div>', () => `<div id="root">${render(data)}</div><script id="nucleus-data" type="application/json">${safeData}</script>`);
+        html = html.replace('<div id="root"></div>', () => `<div id="root">${render(data, req.path)}</div><script id="nucleus-data" type="application/json">${safeData}</script>`);
         const organization = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Nucleus SJEC', url: origin || 'https://nucleussjec.in', logo: `${origin || 'https://nucleussjec.in'}/brain-mark.svg`, email: data.settings.contactEmail, sameAs: [data.settings.instagramUrl, data.settings.githubUrl, data.settings.linkedinUrl].filter(Boolean), parentOrganization: { '@type': 'CollegeOrUniversity', name: 'St. Joseph Engineering College', address: { '@type': 'PostalAddress', addressLocality: 'Mangaluru', addressCountry: 'IN' } } };
         html = html.replace('</head>', () => `<script type="application/ld+json">${JSON.stringify(organization).replace(/</g, '\\u003c')}</script></head>`);
+      }
+      if (/^\/team\/?$/.test(req.path)) {
+        const description = 'Meet the core team and members of Nucleus, the student innovation community at St. Joseph Engineering College, Mangaluru.';
+        html = html.replace(/<title>[^<]*<\/title>/, '<title>The team | Nucleus SJEC</title>')
+          .replace(/(<meta (?:name|property)="(?:description|og:description|twitter:description)" content=")[^"]*("\s*\/?>)/g, `$1${description}$2`)
+          .replace(/(<meta (?:name|property)="(?:og:title|twitter:title)" content=")[^"]*("\s*\/?>)/g, '$1The team | Nucleus SJEC$2')
+          .replace(/(<link rel="canonical" href=")[^"]*("\s*\/?>)/, '$1https://nucleussjec.in/team$2')
+          .replace(/(<meta property="og:url" content=")[^"]*("\s*\/?>)/, '$1https://nucleussjec.in/team$2');
       }
       res.set('Cache-Control', 'no-cache').type('html').send(html);
     });
