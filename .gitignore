@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules/
 dist/
 data/
@@ -8,3 +9,16 @@ data/
 playwright-report/
 test-results/
 .vercel
+=======
+node_modules/
+dist/
+data/
+.env
+.env.*.local
+*.tsbuildinfo
+*.log
+playwright-report/
+test-results/
+.vercel
+.env*
+>>>>>>> 24551fe568b8ad3d66a35507c45e3569b24f2d26
