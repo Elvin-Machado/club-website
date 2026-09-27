@@ -30,12 +30,32 @@ test('the scroll cue is present and the letterbox frames the hero', async ({ pag
 
 // --- Roster -----------------------------------------------------------------
 
-test('the roster lists 4 members grouped into 2 teams', async ({ page }) => {
+test('the roster lists 3 members in one team', async ({ page }) => {
   await page.goto(TEAM);
   const rows = page.locator('.roster-row');
-  await expect(rows).toHaveCount(4);
-  await expect(page.locator('.roster-group')).toHaveCount(2);
-  await expect(page.locator('.roster-result-count')).toContainText('04');
+  await expect(rows).toHaveCount(3);
+  await expect(page.locator('.roster-group')).toHaveCount(1);
+  await expect(page.locator('.roster-result-count')).toContainText('03');
+});
+
+test('the core orbit shows twelve leadership roles with no vacant seat', async ({ page }) => {
+  await page.goto(TEAM);
+  await page.locator('#core-team').scrollIntoViewIfNeeded();
+
+  // Desktop renders the R3F orbit, mobile the carousel, so assert on the
+  // leadership seats themselves rather than a single presentation component.
+  const roles = [
+    'President', 'Vice President', 'Secretary', 'Tech Lead', 'AI & ML Lead',
+    'Dev Lead', 'DSA Lead', 'Discipline Head', 'Treasurer', 'Event Lead',
+    'Planning & Strategy Lead', 'Media Lead',
+  ];
+  for (const role of roles) {
+    await expect(page.getByText(role, { exact: true }).first()).toBeAttached({ timeout: 15_000 });
+  }
+
+  // The vacated System Design seat is gone rather than left as a placeholder.
+  await expect(page.getByText('To be announced')).toHaveCount(0);
+  await expect(page.getByText('System Design Lead', { exact: true })).toHaveCount(0);
 });
 
 test('search filters the roster by name, by team, and clears again', async ({ page }) => {
@@ -61,7 +81,7 @@ test('search filters the roster by name, by team, and clears again', async ({ pa
   await expect(rows).toHaveCount(0);
 
   await page.locator('.roster-clear').click();
-  await expect(rows).toHaveCount(4);
+  await expect(rows).toHaveCount(3);
 });
 
 test('team filter chips narrow the roster and mark themselves pressed', async ({ page }) => {
@@ -75,7 +95,7 @@ test('team filter chips narrow the roster and mark themselves pressed', async ({
   await expect(rows).toHaveCount(3);
 
   await page.locator('.roster-filters button', { hasText: 'All teams' }).click();
-  await expect(rows).toHaveCount(4);
+  await expect(rows).toHaveCount(3);
 });
 
 test('roster rows are typographic only until real portraits are added', async ({ page }) => {
@@ -166,7 +186,7 @@ test('reduced motion skips the WebGL canvas and still renders content', async ({
 
   // The hero and roster are complete without any 3D scene.
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Nucleus');
-  await expect(page.locator('.roster-row')).toHaveCount(4);
+  await expect(page.locator('.roster-row')).toHaveCount(3);
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 

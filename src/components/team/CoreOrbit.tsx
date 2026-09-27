@@ -31,7 +31,7 @@ function Planet({ member, index, total, onSelect, frozen, radius }: { member: Co
     </mesh>
     <mesh scale={hovered ? 1.4 : 1}><sphereGeometry args={[0.24, 16, 12]} /><meshBasicMaterial color="#b6efd3" transparent opacity={0.09} depthWrite={false} blending={AdditiveBlending} /></mesh>
     <mesh><sphereGeometry args={[0.39, 12, 8]} /><meshBasicMaterial color="#b6efd3" transparent opacity={0.025} depthWrite={false} blending={AdditiveBlending} /></mesh>
-    <Html center position={[0, -0.29, 0]} zIndexRange={[20, 0]} style={{ pointerEvents: frozen ? 'none' : 'auto' }}>
+    <Html center position={[0, -0.29, 0]} style={{ pointerEvents: frozen ? 'none' : 'auto' }}>
       <button className={`orbit-node-label ${hovered ? 'is-hovered' : ''}`} onPointerDown={event => event.stopPropagation()} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocus={() => setHovered(true)} onBlur={() => setHovered(false)} onClick={select} aria-label={`Meet ${member.name}, ${member.role}`} aria-haspopup="dialog" disabled={frozen}>
         <span>{member.name}</span><small>{member.role}</small>
       </button>
@@ -44,6 +44,8 @@ function OrbitWorld({ core, selectedId, onSelect, onFocused, paused, resetKey }:
   const group = useRef<Group>(null);
   const controls = useRef<OrbitControlsImpl>(null);
   const { camera, clock } = useThree();
+  const [labelsReady, setLabelsReady] = useState(false);
+  useEffect(() => { const id = requestAnimationFrame(() => setLabelsReady(true)); return () => cancelAnimationFrame(id); }, []);
   const focusPoint = useRef(new Vector3());
   const startPosition = useRef(new Vector3());
   const startTarget = useRef(new Vector3());
@@ -101,7 +103,7 @@ function OrbitWorld({ core, selectedId, onSelect, onFocused, paused, resetKey }:
     <group ref={group}>
       <Line points={points} color="#b6efd3" transparent opacity={0.26} lineWidth={0.8} />
       <Line points={inner} color="#b6efd3" transparent opacity={0.09} lineWidth={0.65} dashed dashSize={0.055} gapSize={0.12} />
-      {core.map((member, index) => <Planet key={member.id} member={member} index={index} total={core.length} frozen={Boolean(selectedId)} radius={radius} onSelect={(person, position) => { focusPoint.current.copy(position); onSelect(person); }} />)}
+      {labelsReady && core.map((member, index) => <Planet key={member.id} member={member} index={index} total={core.length} frozen={Boolean(selectedId)} radius={radius} onSelect={(person, position) => { focusPoint.current.copy(position); onSelect(person); }} />)}
     </group>
     <Html center position={[0, 0, 0]} zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}><div className="orbit-emblem"><Image src="/brain-mark.svg" alt="Nucleus emblem" width={80} height={80} /><span>NUCLEUS</span><small>OUR COMMON CENTRE</small></div></Html>
     <OrbitControls ref={controls} enabled={!selectedId} enableZoom={false} enablePan={false} enableDamping dampingFactor={0.07} rotateSpeed={0.4} minPolarAngle={0.5} maxPolarAngle={1.12} onStart={() => { idleAt.current = Infinity; }} onEnd={() => { idleAt.current = clock.elapsedTime + 3; }} />

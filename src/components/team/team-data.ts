@@ -6,8 +6,9 @@ import type { ClubMember, CoreMember } from './types';
 // unset everywhere and the UI falls back to initials (see MemberPhoto). Add a
 // photo path per person as real portraits become available.
 //
-// The System Design seat is currently vacant in the source data; it is listed
-// so the orbit shows the full set of twelve leadership roles.
+// The twelve core seats mirror shared/public-data.json exactly. There is no
+// System Design Lead in the source data, so that seat is left out rather than
+// filled with a placeholder.
 export const exampleCore: CoreMember[] = [
   {
     id: 'poorvik',
@@ -52,10 +53,10 @@ export const exampleCore: CoreMember[] = [
     bio: 'Helps members strengthen their problem-solving foundations through algorithms, peer practice, and conversations about how and why a solution works.',
   },
   {
-    id: 'system-design-lead',
-    name: 'To be announced',
-    role: 'System Design Lead',
-    bio: 'Will guide exploration of architecture, connected services, and the trade-offs behind reliable systems, from a simple sketch to the bigger picture.',
+    id: 'manvitha',
+    name: 'Manvitha Lewis',
+    role: 'Discipline Head',
+    bio: 'Helps maintain a respectful, welcoming environment and supports the shared standards that allow every member to learn and contribute.',
   },
   {
     id: 'karthik',
@@ -84,7 +85,6 @@ export const exampleCore: CoreMember[] = [
 ];
 
 export const exampleMembers: ClubMember[] = [
-  { id: 'manvitha', name: 'Manvitha Lewis', role: 'Discipline Head', team: 'Operations' },
   { id: 'salim', name: 'Salim Pallikal', role: 'Member', team: 'Community' },
   { id: 'nikhitha', name: 'Nikhitha Dsouza', role: 'Member', team: 'Community' },
   { id: 'saniya', name: 'Aisahath Saniya', role: 'Member', team: 'Community' },
