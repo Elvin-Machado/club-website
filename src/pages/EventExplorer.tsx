@@ -1,4 +1,4 @@
-﻿import { Component, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode, type RefObject } from 'react';
+import { Component, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode, type RefObject } from 'react';
 import { ArrowDown, ArrowRight, ArrowUp, CalendarDays, Layers3, MapPin, RotateCcw, Route, X } from 'lucide-react';
 import { createStations, type MoveInput, type WorldMode } from '../lib/event-navigation';
 import type { ClubEvent } from '../types';

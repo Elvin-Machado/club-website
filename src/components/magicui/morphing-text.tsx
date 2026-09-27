@@ -1,4 +1,4 @@
-﻿import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 export function MorphingText({ texts, className = '' }: { texts: string[]; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);

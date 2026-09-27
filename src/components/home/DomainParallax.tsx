@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ArrowUpRight, MessageCircle } from 'lucide-react';
 import { CardContainer, CardBody, CardItem } from '../ui/3d-card';
 import './domain-parallax.css';
