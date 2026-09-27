@@ -1,6 +1,6 @@
 import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode, type RefObject } from 'react';
 import { ArrowRight, ArrowUpRight, CalendarDays, Check, Compass, Expand, ImageIcon, Layers3, List, LoaderCircle, MapPin, Maximize2, MousePointer2, Move, Plus, RotateCcw, ScanLine, X } from 'lucide-react';
-import logoUrl from '../assets/NucleusLogo_transparent.png';
+const logoUrl = '/NucleusLogo_transparent.png';
 import { SPAWN, START_YAW, createStations, WORLD, type Station, type MoveInput, type WorldMode, type WorldSnapshot } from '../lib/event-navigation';
 import type { ClubEvent } from '../types';
 import './event-explorer.css';

@@ -1,4 +1,4 @@
-import logoUrl from '../assets/NucleusLogo_transparent.png';
+const logoUrl = '/NucleusLogo_transparent.png';
 
 export function Logo({ className = '' }: { className?: string }) {
   return (

@@ -1,100 +1,125 @@
 # Nucleus SJEC
 
-A full-stack club website for the Nucleus student innovation community at St. Joseph Engineering College, Mangaluru. React + Vite (SSR) frontend, Express + SQLite backend.
+A full-stack club website for the Nucleus student innovation community at St. Joseph Engineering College, Mangaluru.
+
+**Frontend:** Next.js 16 (App Router) for the Team showcase, Vite (SSR) for the legacy pages.  
+**Backend:** Express + SQLite for events, projects, applications, and admin.
 
 ## Project structure
 
 ```
-├── api/index.mjs            Vercel serverless entry (wraps server/app.mjs)
-├── server/
-│   ├── app.mjs              Express app, middleware, public + admin API routes
-│   ├── db.mjs               SQLite database (WAL, auto-seeded from shared/ on first run)
-│   ├── index.mjs             Node server entry (loads .env, serves SSR + static files)
-│   └── create-admin.mjs     CLI to create an admin account
-├── shared/public-data.json  Seed data for events, projects, team, and settings
 ├── src/
-│   ├── main.tsx             Client entry (BrowserRouter + lazy Admin)
-│   ├── entry-server.tsx     SSR entry (StaticRouter)
-│   ├── App.tsx              Route definitions + shared layout
-│   ├── Admin.tsx             Admin dashboard (lazy-loaded)
-│   ├── Team.tsx              Full team page (GSAP ScrollTrigger + Three.js orbit)
-│   ├── api.ts               Typed fetch wrapper for /api/* routes
-│   ├── types.ts             Shared TypeScript interfaces
-│   ├── styles.css            Global styles + utility classes
-│   ├── team.css              Team page styles
-│   ├── admin.css             Admin dashboard styles
-│   ├── assets/               Static imports (Nucleus logo)
+│   ├── app/                        Next.js App Router
+│   │   ├── layout.tsx                Root layout
+│   │   ├── globals.css               Tailwind + font faces
+│   │   ├── team/page.tsx             Team constellation page
+│   │   └── (existing)/               Catch-all for legacy Vite pages
 │   ├── components/
-│   │   ├── Logo.tsx             SVG logo component
-│   │   ├── Modal.tsx            Accessible modal
-│   │   ├── LogoLanding.tsx      Three.js particle logo landing (/ route)
-│   │   ├── LogoWorld.tsx        3D logo world used by EventExplorer
-│   │   ├── DomainParallax.tsx   Domain showcase (parallax scroll, / route)
-│   │   ├── EventExplorer.tsx    Three.js event coaster + list (/events)
-│   │   ├── TeamOrbit.tsx        Three.js team orbit illustration (/team)
-│   │   └── magicui/morphing-text.tsx  Morphing text animation
-│   └── lib/
-│       ├── event-logo.json    Station geometry data for the event ride
-│       ├── event-navigation.ts Graph of walkable event stations
-│       ├── event-world.ts     Three.js scene builder for the event ride
-│       ├── logo-scene.ts      Three.js scene builder for the logo landing
-│       └── team.ts            Team role definitions and roster logic
+│   │   ├── team/                     Team constellation components
+│   │   │   ├── GalaxyHero.tsx          R3F starfield + letterbox + film grain
+│   │   │   ├── CoreOrbit.tsx           Desktop 3D orbit ring (8 nodes)
+│   │   │   ├── CoreCarousel.tsx        Mobile swipe carousel fallback
+│   │   │   ├── MemberProfileOverlay.tsx Modal dialog for core profiles
+│   │   │   ├── RosterSection.tsx       Searchable grouped credits-roll
+│   │   │   ├── TeamShowcase.tsx        Orchestrates hero → orbit → roster
+│   │   │   ├── MemberPhoto.tsx         next/image wrapper
+│   │   │   ├── SceneBoundary.tsx       WebGL error boundary
+│   │   │   ├── useSceneCapabilities.ts Detects WebGL, mobile, reduced-motion
+│   │   │   ├── team-data.ts            Example core + roster data
+│   │   │   ├── team-showcase.css       Scoped styles
+│   │   │   ├── roster.ts              Filter + group helpers
+│   │   │   └── types.ts               CoreMember, ClubMember, TeamShowcaseProps
+│   │   ├── ExistingSite.tsx           Vite legacy site renderer
+│   │   ├── EventExplorer.tsx          Three.js event coaster
+│   │   ├── Logo.tsx                   SVG logo
+│   │   ├── Modal.tsx                  Shared modal
+│   │   └── ...
+│   ├── lib/                        Shared logic (team roles, event navigation)
+│   ├── assets/                     Static imports (logo)
+│   ├── styles.css                  Legacy global styles
+│   ├── App.tsx                     Legacy router (Vite entry)
+│   ├── main.tsx                    Legacy client entry
+│   └── entry-server.tsx            Legacy SSR entry
+├── server/
+│   ├── app.mjs                      Express app + admin API
+│   ├── db.mjs                       SQLite (WAL, auto-seeded)
+│   ├── index.mjs                    Node server entry
+│   ├── start.mjs                    Launches both API + Next.js
+│   └── create-admin.mjs             CLI admin creation
+├── api/index.mjs                   Vercel serverless entry
+├── shared/public-data.json         Seed data
 ├── tests/
-│   ├── backend.test.mjs       API, auth, CSRF, SSR, and database tests
-│   ├── event-navigation.test.mjs  Event graph connectivity and reachability
-│   └── team.test.mjs          Team role matching and roster logic
-├── public/                 Static assets served at root (fonts, icons, sitemap)
-├── scripts/trace-event-logo.py  Dev utility: trace logo paths for station geometry
-├── dist/                   Production build output (gitignored)
-├── data/nucleus.sqlite     Runtime database (gitignored)
-├── index.html              Vite entry HTML
-├── vite.config.ts          Vite + React plugin config
-├── tsconfig.json           TypeScript strict config (src/ only)
-├── package.json            Dependencies, scripts, engine constraint
-├── Dockerfile              Multi-stage Docker build (Node 24 Alpine)
-└── vercel.json             Vercel build config (serverless backend + static frontend)
+│   ├── *.test.mjs                  22 integration tests (API, auth, data)
+│   ├── team-showcase.test.mjs       Roster logic unit tests
+│   └── e2e/team.spec.mjs           21 Playwright e2e tests
+├── public/                         Static assets (fonts, icons, team portraits)
+├── scripts/                        Dev utilities
+├── next.config.mjs                 Next.js config (image patterns, API proxy)
+├── vite.config.ts                  Vite config (legacy pages)
+├── playwright.config.mjs           Playwright config
+├── tsconfig.json                   TypeScript strict config
+├── Dockerfile                      Multi-stage Docker build
+├── vercel.json                     Vercel deployment config
+└── package.json
 ```
 
 ## Run locally
 
-Requires **Node.js 24+**. SQLite is built into Node — no separate database service needed.
+Requires **Node.js 24+**. SQLite is built into Node.
 
 ```sh
 npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. Vite proxies `/api` to the Express server at port 3001. Both processes stop together with Ctrl+C.
+Opens both:
+- **http://localhost:3000** — Next.js (Team page + legacy page proxy)
+- **http://localhost:5173** — Vite dev server (legacy pages)
 
 Other dev commands:
 
 ```sh
-npm run dev:web     # Vite dev server only (no backend)
-npm run dev:api     # Express server only (no frontend)
+npm run dev:web       # Next.js only
+npm run dev:legacy    # Vite + API
+npm run dev:api       # Express API only
 ```
 
 ## Production build
 
 ```sh
-npm run build       # typecheck + client build + SSR build
-npm start           # production server at http://localhost:3001
+npm run build         # typecheck + Vite build + Next.js build
+npm start             # Express API (port 3001) + Next.js (port 3000)
 ```
 
-Or run the full verification pipeline:
+## Pages and features
 
-```sh
-npm run check       # build + all integration tests
-```
+| Route | Framework | Description |
+|-------|-----------|-------------|
+| `/team` | Next.js | Cinematic team page: R3F starfield, 3D orbit (8 core), profile overlays, searchable roster (30 members across 6 teams) |
+| `/` | Vite | Three.js particle logo landing + domain parallax |
+| `/about` | Vite | Domain cards with detail panels |
+| `/events` | Vite | Three.js event coaster ride |
+| `/projects` | Vite | Project grid with links |
+| `/admin` | Vite | Admin dashboard (lazy-loaded, auth required) |
+
+### Team page details
+
+- **Hero:** Full-bleed React Three Fiber starfield with particle drift, parallax on mouse move, letterbox bars for cinematic framing, film-grain overlay, scroll cue
+- **Core orbit (desktop):** 8 glowing nodes orbiting a central emblem; drag to rotate, click to dolly-zoom into a profile overlay
+- **Carousel (mobile):** Swipeable card carousel replacing the 3D orbit
+- **Profile overlay:** Full-bleed dialog with photo, bio, socials, smooth transitions
+- **Roster:** Grouped by team (Tech, Design, Events, Outreach, Content, Ops), search by name/team/role, hover-reveal portraits, staggered viewport entrance
+- **Accessibility:** Reduced-motion: static starfield, no WebGL canvas, simple fades. Skip link. Search field with label. Profile dialog with focus trap.
+- **Performance:** R3F dynamically imported with `ssr: false`. Particle/geometry counts reduced on mobile. WebGL context capped and disposed on unmount.
 
 ## Verification
 
 ```sh
-npm run typecheck   # TypeScript strict check
-npm test            # 19 integration tests (API, auth, SSR, event graph, team)
-npm run check       # build + tests in one command
+npm run typecheck       # TypeScript strict check
+npm test                # 22 integration tests
+npx playwright test     # 21 e2e tests (hero, roster, carousel, profile, a11y)
+npm run build           # full production build
 ```
-
-Tests cover: public API, password hashing, rate limiting, CSRF protection, origin checks, intake lifecycle, application validation and dedup, content CRUD, database persistence, server-rendered production routes, event graph connectivity, and team role logic.
 
 ## Administrator access
 
@@ -102,71 +127,29 @@ Tests cover: public API, password hashing, rate limiting, CSRF protection, origi
 npm run admin:create
 ```
 
-Prompts for an email and password (12+ characters). Then open `/admin` in the browser to sign in. There are no default credentials or public registration — create a separate account per administrator.
+Prompts for email + password (12+ chars). Open `/admin` to sign in.
 
-The dashboard supports:
-
-- Add, edit, publish/unpublish, and delete events and projects
-- Add, edit, and remove team members (including introduction/biography)
-- Open or close recruitment, set a deadline and intake identifier, and edit contact links
-- Review paginated applications and update their internal status
-
-## Pages and features
-
-| Route | Description |
-|-------|-------------|
-| `/` | Three.js particle logo landing + domain parallax showcase |
-| `/about` | Domain cards with detail panels |
-| `/events` | Three.js event coaster ride (walkable stations) + list fallback |
-| `/projects` | Project grid with links |
-| `/team` | Full team page: GSAP ScrollTrigger core team section, member cards with dialog bios, Three.js orbit |
-| `/admin` | Admin dashboard (lazy-loaded, requires login) |
-
-**Accessibility**: Reduced-motion preferences automatically use list/static views. Lost WebGL falls back to static markup. The server renders the landing, domains, and all routes without client JavaScript.
-
-## Backend and data
-
-The default database is `data/nucleus.sqlite` with SQLite WAL enabled. It is seeded once from `shared/public-data.json` on first run; restarting preserves edits.
-
-**Public routes:**
+## Backend
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/health` | GET | Server and database readiness |
-| `/api/site` | GET | Published events, projects, team, and current settings |
-| `/api/applications` | POST | Validated application submission |
+| `/api/health` | GET | Server readiness |
+| `/api/site` | GET | Published events, projects, team, settings |
+| `/api/applications` | POST | Application submission |
 
-Admin routes under `/api/admin/*` require an authenticated session with CSRF token. Passwords use scrypt with random salts. Cookies use `HttpOnly`, `SameSite=Strict`, and `__Host-` prefix in production.
-
-Accepted recruitment domains: `aiml`, `web`, `dsa`.
+Admin routes under `/api/admin/*` require authenticated session + CSRF. Passwords use scrypt + random salts.
 
 ## Deployment
 
-Copy `.env.example` to `.env` for local configuration. Production requires:
-
-```dotenv
-NODE_ENV=production
-HOST=0.0.0.0
-PORT=3001
-APP_ORIGIN=https://nucleussjec.in
-DATABASE_PATH=/app/data/nucleus.sqlite
-TRUST_PROXY=1
-```
-
-This backend requires **a persistent Node host and persistent disk**. Do not deploy SQLite to an ephemeral serverless filesystem. A frontend-only Vercel upload will not run this backend.
-
-**Docker:**
-
 ```sh
+# Docker
 docker build -t nucleus .
-docker run -d --name nucleus -p 3001:3001 -v nucleus-data:/app/data -e APP_ORIGIN=https://nucleussjec.in -e TRUST_PROXY=1 nucleus
+docker run -d -p 3001:3001 -v nucleus-data:/app/data -e APP_ORIGIN=https://nucleussjec.in nucleus
 docker exec -it nucleus npm run admin:create
 ```
 
-**Vercel:** `api/index.mjs` serves as a serverless function, but the SQLite database needs a persistent volume. Vercel is suitable for the static frontend; pair it with a separate persistent host for the API.
-
-Back up the database regularly. Do not copy the `.sqlite` file while the server is running — pending writes may be in the WAL file.
+The backend requires a persistent host and disk for SQLite. The Next.js frontend can deploy to Vercel or any Node host.
 
 ## License
 
-Internal club project. Not currently licensed for public use.
+Internal club project.

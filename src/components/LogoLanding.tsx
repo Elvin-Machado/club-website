@@ -1,5 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
-import logoUrl from '../assets/NucleusLogo_transparent.png';
+const logoUrl = '/NucleusLogo_transparent.png';
 import { MorphingText } from './magicui/morphing-text';
 import './logo-landing.css';
 
