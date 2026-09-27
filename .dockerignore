@@ -1,8 +1,9 @@
 node_modules
 dist
+.next
 data
 .git
-.env
-.env.*
+.env*
 *.log
+*.tsbuildinfo
 test-results

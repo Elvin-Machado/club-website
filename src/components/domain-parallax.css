@@ -89,11 +89,6 @@
   box-shadow: 0 0 50px rgba(107, 164, 171, 0.12);
 }
 
-.dp-card--active {
-  border-color: rgba(107, 164, 171, 0.55);
-  background: rgba(107, 164, 171, 0.1);
-}
-
 .dp-card__icon-row {
   display: flex;
   align-items: center;

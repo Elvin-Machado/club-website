@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { ArrowUpRight, ArrowRight, ArrowDown, Menu, X, BrainCircuit, Code2, Network, Github, Instagram, Linkedin, Mail, Check, Sparkles, LoaderCircle, Plus, Minus } from 'lucide-react';
-import { Intro, Logo } from './components/Logo';
+import { ArrowUpRight, ArrowRight, Menu, X, BrainCircuit, Code2, Network, Github, Instagram, Linkedin, Mail, Check, LoaderCircle } from 'lucide-react';
+import { Logo } from './components/Logo';
 import Modal from './components/Modal';
 import { api } from './api';
 import type { SiteData, SiteSettings } from './types';
@@ -9,6 +9,7 @@ import seed from '../shared/public-data.json';
 import LogoLanding from './components/LogoLanding';
 import EventExplorer from './components/EventExplorer';
 import DomainParallax from './components/DomainParallax';
+import TeamPage from './Team';
 
 const domains = [
   { id: 'aiml', num: '01', title: 'Artificial Intelligence', subtitle: '& Machine Learning', icon: BrainCircuit, tags: ['Intelligence', 'Research', 'Possibility'], description: 'From a first model to the next big question. Explore the systems that learn, adapt, and open up entirely new possibilities.', detail: 'Explore model building, machine learning foundations, research papers, and practical AI applications. Bring your curiosity; build your understanding through collaborative experiments.' },
@@ -44,7 +45,7 @@ function ApplyForm({ settings, online, onClose }: { settings: SiteSettings; onli
 export default function App({ initialData = seed }: { initialData?: SiteData }) {
   const [data, setData] = useState<SiteData>(initialData), [online, setOnline] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false), [applyOpen, setApplyOpen] = useState(false);
-  const [domain, setDomain] = useState<number | null>(null), [teamExpanded, setTeamExpanded] = useState(false), [faq, setFaq] = useState<number | null>(0);
+  const [domain, setDomain] = useState<number | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -65,12 +66,6 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
   }, [location.pathname]);
 
   const settings = data.settings;
-  const faqs = [
-    ['Do I need to be an expert to join?', 'No. A willingness to learn and contribute is a great starting point. Pick a domain that makes you curious and tell us what you’d like to explore.'],
-    ['What can I work on at Nucleus?', 'Our three core domains are AI & Machine Learning, Web Development, and Data Structures & Algorithms. Explore hands-on projects, sessions, and collaborative learning with the community.'],
-    ['When can I apply?', settings.recruitmentOpen ? `Applications are open for our ${settings.cycle} intake. Use the Join Nucleus button to apply.${settings.recruitmentDeadline ? ` The deadline is ${new Date(settings.recruitmentDeadline).toLocaleDateString('en-IN', { dateStyle: 'long' })}.` : ''}` : settings.recruitmentMessage],
-    ['How do I get in touch?', `Write to ${settings.contactEmail}, or find Nucleus on Instagram and LinkedIn. We’d love to hear your questions and ideas.`],
-  ];
 
   // Make the Logo Landing Animation the main Home Page
   if (location.pathname === '/') {
@@ -131,9 +126,7 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
         } />
 
         <Route path="/team" element={
-          <section className="team-section section-wrap section-space" id="team"><div className="section-heading"><span className="eyebrow"><span className="section-number">04</span> THE PEOPLE</span><span className="section-side-note">INDIVIDUALLY CURIOUS.<br />COLLECTIVELY NUCLEUS.</span></div><div className="split-heading"><h2>The minds<br /><em>behind the spark.</em></h2><p>Students, collaborators, and your next teammates.<br />Meet the people making it happen.</p></div>
-            <div className="team-grid">{data.team.slice(0, teamExpanded ? undefined : 6).map((member, index) => <article className="member-card" key={member.id}><span className={`member-avatar avatar-${index % 3}`} aria-hidden="true">{member.initials}<span>✳</span></span><div><h3>{member.name}</h3><p>{member.role}</p></div><span className="member-number">{String(index + 1).padStart(2, '0')}</span></article>)}</div>{data.team.length > 6 && <button className="button outline team-expand" onClick={() => setTeamExpanded(!teamExpanded)} aria-expanded={teamExpanded}>{teamExpanded ? 'Show less' : `Meet all ${data.team.length} minds`}{teamExpanded ? <Minus size={17} /> : <Plus size={17} />}</button>}
-          </section>
+          <TeamPage team={data.team} onJoin={() => setApplyOpen(true)} />
         } />
       </Routes>
     </main>

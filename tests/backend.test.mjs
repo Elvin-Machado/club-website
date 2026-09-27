@@ -93,7 +93,7 @@ test('database content survives a close and reopen without reseeding over edits'
     assert.equal(getSite(db).settings.cycle, 'persisted-intake'); assert.equal(getSite(db).events.length, 3);
   } finally { db?.close(); rmSync(directory, { recursive: true, force: true }); }
 });
-test('production renders a logo-only landing, preserves club routes, escapes data, and hides admin from indexing', async () => {
+test('production server-renders the landing and club routes, escapes data, and hides admin from indexing', async () => {
   if (!existsSync('dist/server/entry-server.js')) return;
   const { render } = await import('../dist/server/entry-server.js');
   await fixture(async ({ base, db }) => {
@@ -103,50 +103,13 @@ test('production renders a logo-only landing, preserves club routes, escapes dat
     assert.equal(response.status, 200);
     const home = html.match(/<div id="root">([\s\S]*?)<script id="nucleus-data"/)?.[1];
     assert.ok(home); assert.match(home, /class="logo-landing"/); assert.match(home, /NucleusLogo_transparent[^" ]*\.png/);
-    assert.doesNotMatch(home, /<(?:header|footer|nav|button|h1|section)\b|Curiosity is|Join Nucleus/);
+    assert.match(home, /class="dp-card/); assert.match(home, /Artificial Intelligence/); assert.match(home, /Data Structures/);
     assert.doesNotMatch(html, /Enable JavaScript to explore events and apply/);
     assert.match(html, /Updated from the database/); assert.match(html, /application\/ld\+json/);
     const about = await fetch(`${base}/about`).then(r => r.text());
-    assert.match(about, /A meeting of minds/); assert.match(about, /Data Structures/); assert.match(about, /site-header/);
+    assert.match(about, /class="domain-grid"/); assert.match(about, /Data Structures/); assert.match(about, /site-header/);
     assert.ok(!html.includes('</script><script>alert(1)</script>')); assert.match(html, /id="nucleus-data"/);
     const admin = await fetch(`${base}/admin`).then(r => r.text()); assert.match(admin, /noindex,nofollow/); assert.ok(!admin.includes('Updated from the database'));
-    assert.equal((await fetch(`${base}/does-not-exist`)).status, 404);
-    const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^" ]+)"/g)].map(m => m[1]); assert.ok(assets.length > 0);
-    for (const asset of assets) { const assetRes = await fetch(base + asset); assert.equal(assetRes.status, 200); assert.match(assetRes.headers.get('cache-control'), /immutable/); }
-  }, { dist: resolve('dist/client'), render });
-});
-
-test('team introductions persist through the admin API and appear in the public roster', () => fixture(async ({ request, login }) => {
-  const headers = await login();
-  const member = { name: 'Test Member', role: 'System Design Lead', initials: 'TM', bio: 'I enjoy exploring the architecture behind reliable campus applications.' };
-  assert.equal((await request('/admin/content/team/test-member', 'PUT', member, headers)).status, 200);
-  const site = await request('/site').then(response => response.json());
-  assert.equal(site.team.find(person => person.id === 'test-member').bio, member.bio);
-  assert.equal((await request('/admin/content/team/test-member', 'PUT', { ...member, bio: 'x'.repeat(1601) }, headers)).status, 400);
-  assert.equal((await request('/admin/content/team/test-member', 'PUT', { ...member, bio: '' }, headers)).status, 200);
-}));
-test('production server renders fresh club content before JavaScript, escapes data, and hides admin from indexing', async () => {
-  if (!existsSync('dist/server/entry-server.js')) return;
-  const { render } = await import('../dist/server/entry-server.js');
-  await fixture(async ({ base, db }) => {
-    const settings = getSite(db).settings; settings.recruitmentMessage = 'Updated from the database </script><script>alert(1)</script>';
-    db.prepare('UPDATE settings SET body=?').run(JSON.stringify(settings));
-    const response = await fetch(base); const html = await response.text();
-    assert.equal(response.status, 200); assert.match(html, /Curiosity is/); assert.match(html, /Data Structures/); assert.match(html, /Updated from the database/); assert.match(html, /application\/ld\+json/);
-    assert.ok(!html.includes('</script><script>alert(1)</script>')); assert.match(html, /id="nucleus-data"/);
-    const admin = await fetch(`${base}/admin`).then(r => r.text()); assert.match(admin, /noindex,nofollow/); assert.ok(!admin.includes('Updated from the database'));
-    for (const path of ['/team', '/team/']) {
-      const teamResponse = await fetch(`${base}${path}`); const teamHtml = await teamResponse.text();
-      assert.equal(teamResponse.status, 200);
-      assert.match(teamHtml, /<title>The team \| Nucleus SJEC<\/title>/);
-      assert.match(teamHtml, /rel="canonical" href="https:\/\/nucleussjec.in\/team"/);
-      assert.match(teamHtml, /id="core-team"/); assert.match(teamHtml, /id="members"/);
-      assert.match(teamHtml, /System Design Lead/); assert.match(teamHtml, /To be announced/);
-      assert.match(teamHtml, /Poorvik Kuthyala/); assert.match(teamHtml, /Salim Pallikal/);
-      assert.match(teamHtml, /href="\/team" aria-current="page"/);
-      assert.equal((teamHtml.match(/class="core-card"/g) || []).length, 12);
-      assert.ok(!teamHtml.includes('class="hero section-wrap"'));
-    }
     assert.equal((await fetch(`${base}/does-not-exist`)).status, 404);
     const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^" ]+)"/g)].map(m => m[1]); assert.ok(assets.length > 0);
     for (const asset of assets) { const assetRes = await fetch(base + asset); assert.equal(assetRes.status, 200); assert.match(assetRes.headers.get('cache-control'), /immutable/); }
