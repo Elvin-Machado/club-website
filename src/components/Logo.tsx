@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
+import logoUrl from '../../NucleusLogo_transparent.png';
 
 export function Logo({ className = '' }: { className?: string }) {
-  return <img className={`brand-mark ${className}`} src="/brain-mark.svg" alt="" width="56" height="56" />;
+  return (
+    <svg className={`brand-mark ${className}`} viewBox="430 128 672 625" aria-hidden="true" width="56" height="56">
+      <image href={logoUrl} width="1599" height="899" />
+    </svg>
+  );
 }
 
 export function Intro() {
