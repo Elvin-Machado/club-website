@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import logoUrl from '../../NucleusLogo_transparent.png';
+import { MorphingText } from './magicui/morphing-text';
 import './logo-landing.css';
 
 export default function LogoLanding() {
@@ -18,10 +19,7 @@ export default function LogoLanding() {
       disposeScene?.();
       disposeScene = undefined;
       setStatus('loading');
-      if (motion.matches) {
-        setStatus('still');
-        return;
-      }
+      // Removed prefers-reduced-motion check as per user request
       try {
         const { createLogoScene } = await import('../lib/logo-scene');
         if (disposed || current !== generation) return;
@@ -33,7 +31,8 @@ export default function LogoLanding() {
           disposeScene = cleanup;
           setStatus('ready');
         }
-      } catch {
+      } catch (err) {
+        console.error('Logo animation failed:', err);
         if (!disposed && current === generation) setStatus('fallback');
       }
     }
@@ -54,5 +53,8 @@ export default function LogoLanding() {
     <svg className="logo-landing__fallback" viewBox="430 128 672 625" aria-hidden="true">
       <image href={logoUrl} width="1599" height="899" />
     </svg>
+    <div className="logo-landing__text">
+      <MorphingText texts={['THE NUCLEUS CLUB', 'CREATE', 'EXPLORE', 'INNOVATE']} />
+    </div>
   </main>;
 }

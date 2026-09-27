@@ -8,6 +8,7 @@ import type { SiteData, SiteSettings } from './types';
 import seed from '../shared/public-data.json';
 import LogoLanding from './components/LogoLanding';
 import EventExplorer from './components/EventExplorer';
+import DomainParallax from './components/DomainParallax';
 
 const domains = [
   { id: 'aiml', num: '01', title: 'Artificial Intelligence', subtitle: '& Machine Learning', icon: BrainCircuit, tags: ['Intelligence', 'Research', 'Possibility'], description: 'From a first model to the next big question. Explore the systems that learn, adapt, and open up entirely new possibilities.', detail: 'Explore model building, machine learning foundations, research papers, and practical AI applications. Bring your curiosity; build your understanding through collaborative experiments.' },
@@ -48,8 +49,10 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
 
   useEffect(() => {
     const abort = new AbortController();
-    api<SiteData>('/site', { signal: abort.signal }).then(site => { setData(site); setOnline(true); }).catch(error => { if (error.name !== 'AbortError') setOnline(false); });
-    return () => abort.abort();
+    const refresh = () => api<SiteData>('/site', { signal: abort.signal }).then(site => { setData(site); setOnline(true); }).catch(error => { if (error.name !== 'AbortError') setOnline(false); });
+    void refresh();
+    window.addEventListener('focus', refresh);
+    return () => { abort.abort(); window.removeEventListener('focus', refresh); };
   }, []);
 
   useEffect(() => {
@@ -72,15 +75,28 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
   // Make the Logo Landing Animation the main Home Page
   if (location.pathname === '/') {
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
-        <header className="site-header" style={{ position: 'absolute', top: 0, zIndex: 100, width: '100%', background: 'transparent', border: 'none' }}>
-          <Link className="brand" to="/" aria-label="Nucleus home"><Logo /><span>NUCLEUS<small>SJEC · MANGALURU</small></span></Link>
-          <nav className={menuOpen ? 'navigation open' : 'navigation'} aria-label="Main navigation">{[['Home', '/'], ['The idea', '/about'], ['Experiences', '/events'], ['Our work', '/projects'], ['The people', '/team']].map(([label, href]) => <Link key={href} to={href} onClick={() => setMenuOpen(false)}>{label}</Link>)}</nav>
-          <button className="button header-cta" onClick={() => setApplyOpen(true)}>{settings.recruitmentOpen ? 'Join Nucleus' : 'Stay connected'}<ArrowUpRight size={16} /></button>
-          <button className="icon-button menu-toggle" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
-        </header>
-        <LogoLanding />
+      <div className="home-scroll-container" style={{ background: 'var(--bg)' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden' }}>
+          <header className="site-header" style={{ position: 'absolute', top: 0, zIndex: 100, width: '100%', background: 'transparent', border: 'none' }}>
+            <Link className="brand" to="/" aria-label="Nucleus home"><Logo /><span>NUCLEUS<small>SJEC · MANGALURU</small></span></Link>
+            <nav className={menuOpen ? 'navigation open' : 'navigation'} aria-label="Main navigation">{[['Home', '/'], ['The idea', '/about'], ['Experiences', '/events'], ['Our work', '/projects'], ['The people', '/team']].map(([label, href]) => <Link key={href} to={href} onClick={() => setMenuOpen(false)}>{label}</Link>)}</nav>
+            <button className="button header-cta" onClick={() => setApplyOpen(true)}>{settings.recruitmentOpen ? 'Join Nucleus' : 'Stay connected'}<ArrowUpRight size={16} /></button>
+            <button className="icon-button menu-toggle" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
+          </header>
+          <LogoLanding />
+        </div>
+        
+        <DomainParallax
+          domains={domains.map((item, idx) => ({
+            ...item,
+            onClick: () => setDomain(idx),
+          }))}
+        />
+
+        <footer className="site-footer section-wrap" id="contact"><div className="footer-top"><Link className="brand" to="/"><Logo /><span>NUCLEUS<small>A CONNECTION WORTH MAKING.</small></span></Link><div className="footer-socials"><a href={settings.instagramUrl} target="_blank" rel="noreferrer" aria-label="Nucleus Instagram"><Instagram size={19} /></a><a href={settings.linkedinUrl} target="_blank" rel="noreferrer" aria-label="Nucleus LinkedIn"><Linkedin size={19} /></a><a href={settings.githubUrl} target="_blank" rel="noreferrer" aria-label="Nucleus GitHub"><Github size={19} /></a><a href={`mailto:${settings.contactEmail}`} aria-label="Email Nucleus"><Mail size={19} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Nucleus SJEC</span><span>Mangaluru, India · Made of many minds.</span><Link to="/">Back to the beginning <ArrowUpRight size={14} /></Link></div><div className="footer-word" aria-hidden="true">NUCLEUS<span>✳</span></div></footer>
+
         {applyOpen && <ApplyForm settings={settings} online={online} onClose={() => setApplyOpen(false)} />}
+        {domain !== null && <Modal title={`${domains[domain].title} ${domains[domain].subtitle}`} onClose={() => setDomain(null)}><p className="modal-lead">{domains[domain].detail}</p><div className="domain-tags">{domains[domain].tags.map(tag => <span key={tag}>{tag}</span>)}</div><button className="button primary" onClick={() => { setDomain(null); setApplyOpen(true); }}>Find your next connection <ArrowUpRight size={17} /></button></Modal>}
       </div>
     );
   }
@@ -97,15 +113,11 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
 
       <Routes>
         <Route path="/events" element={
-          <section className="events-section section-wrap section-space" id="events"><div className="section-heading"><span className="eyebrow"><span className="section-number">02</span> THE EXPERIENCES</span><span className="section-side-note">A LITTLE EXPLORATION<br />GOES A LONG WAY.</span></div>
-            <div className="split-heading"><h2>Take a ride<br />through <em>our minds.</em></h2><p>Every stop, a new connection.<br />Explore our events inside the Nucleus neural network.</p></div>
-            <EventExplorer events={data.events} />
-          </section>
+          <EventExplorer key={data.events.map(event => event.id).join(',')} events={data.events} />
         } />
 
         <Route path="/about" element={
-          <section className="about section-wrap section-space" id="about"><div className="section-heading"><span className="eyebrow"><span className="section-number">01</span> THE IDEA</span><span className="section-side-note">GOOD THINGS HAPPEN<br />WHEN MINDS MEET.</span></div>
-            <div className="about-intro"><h2>Not just a club.<br /><span>A meeting of minds.</span></h2><div><p>Every big idea begins with a small spark. Nucleus brings curious students together to explore technology, learn by doing, and build things that matter.</p><p className="muted">Different interests. Shared ambition. Find your starting point in one of our three core domains.</p></div></div>
+          <section className="about section-wrap section-space" id="about">
             <div className="domain-grid">{domains.map((item, index) => <button className={`domain-card domain-${item.id}`} key={item.id} onClick={() => setDomain(index)}><div className="domain-card-top"><item.icon size={30} strokeWidth={1.2} /><span>/{item.num}</span></div><h3>{item.title}<span>{item.subtitle}</span></h3><p>{item.description}</p><div className="domain-tags">{item.tags.map(tag => <span key={tag}>{tag}</span>)}</div><span className="domain-explore">Find your spark <ArrowUpRight size={19} /></span></button>)}</div>
           </section>
         } />
@@ -125,7 +137,7 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
         } />
       </Routes>
     </main>
-    <footer className="site-footer section-wrap" id="contact"><div className="footer-top"><Link className="brand" to="/"><Logo /><span>NUCLEUS<small>A CONNECTION WORTH MAKING.</small></span></Link><div className="footer-socials"><a href={settings.instagramUrl} target="_blank" rel="noreferrer" aria-label="Nucleus Instagram"><Instagram size={19} /></a><a href={settings.linkedinUrl} target="_blank" rel="noreferrer" aria-label="Nucleus LinkedIn"><Linkedin size={19} /></a><a href={settings.githubUrl} target="_blank" rel="noreferrer" aria-label="Nucleus GitHub"><Github size={19} /></a><a href={`mailto:${settings.contactEmail}`} aria-label="Email Nucleus"><Mail size={19} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Nucleus SJEC</span><span>Mangaluru, India · Made of many minds.</span><Link to="/">Back to the beginning <ArrowUpRight size={14} /></Link></div><div className="footer-word" aria-hidden="true">NUCLEUS<span>✳</span></div></footer>
+    {location.pathname !== '/about' && location.pathname !== '/events' && <footer className="site-footer section-wrap" id="contact"><div className="footer-top"><Link className="brand" to="/"><Logo /><span>NUCLEUS<small>A CONNECTION WORTH MAKING.</small></span></Link><div className="footer-socials"><a href={settings.instagramUrl} target="_blank" rel="noreferrer" aria-label="Nucleus Instagram"><Instagram size={19} /></a><a href={settings.linkedinUrl} target="_blank" rel="noreferrer" aria-label="Nucleus LinkedIn"><Linkedin size={19} /></a><a href={settings.githubUrl} target="_blank" rel="noreferrer" aria-label="Nucleus GitHub"><Github size={19} /></a><a href={`mailto:${settings.contactEmail}`} aria-label="Email Nucleus"><Mail size={19} /></a></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Nucleus SJEC</span><span>Mangaluru, India · Made of many minds.</span><Link to="/">Back to the beginning <ArrowUpRight size={14} /></Link></div><div className="footer-word" aria-hidden="true">NUCLEUS<span>✳</span></div></footer>}
     {applyOpen && <ApplyForm settings={settings} online={online} onClose={() => setApplyOpen(false)} />}
     {domain !== null && <Modal title={`${domains[domain].title} ${domains[domain].subtitle}`} onClose={() => setDomain(null)}><p className="modal-lead">{domains[domain].detail}</p><div className="domain-tags">{domains[domain].tags.map(tag => <span key={tag}>{tag}</span>)}</div><button className="button primary" onClick={() => { setDomain(null); setApplyOpen(true); }}>Find your next connection <ArrowUpRight size={17} /></button></Modal>}
   </>;

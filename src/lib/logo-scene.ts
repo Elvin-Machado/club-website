@@ -35,7 +35,7 @@ const particleVertex = /* glsl */ `
     gl_Position = projectionMatrix * view;
     gl_PointSize = clamp(aMotion.y * (1.6 - 0.7 * ease) * 2.0 * uPixelRatio
       * uCameraZ / -view.z, 1.0, 12.0 * uPixelRatio);
-    float twinkle = pow(max(0.0, sin(uTime * 0.3 + aMotion.z)), 16.0) * 0.3;
+    float twinkle = 0.0;
     vAlpha = min(1.0, mix(aMotion.w, 1.0, ease) + twinkle * (1.0 - ease))
       * max(0.0, 1.0 - reveal * 1.2) * smoothstep(0.0, 0.3, uTime);
   }
@@ -56,7 +56,7 @@ const dustVertex = /* glsl */ `
     p.xy += uPointer * (0.15 + p.z * 0.04);
     vec4 view = modelViewMatrix * vec4(p, 1.0);
     gl_Position = projectionMatrix * view;
-    float twinkle = pow(max(0.0, sin(uTime * 0.2 + aMotion.w)), 20.0);
+    float twinkle = 0.0;
     gl_PointSize = clamp(aMotion.z * uPixelRatio * uCameraZ / -view.z,
       0.7 * uPixelRatio, 6.0 * uPixelRatio);
     vAlpha = (0.12 + twinkle * 0.2) * smoothstep(0.0, 0.8, uTime);
@@ -247,8 +247,20 @@ export async function createLogoScene(host: HTMLDivElement, url: string, onError
   };
 
   let elapsed = 0, previous = 0;
+  let offscreen = false;
+
+  // Stop rendering when the logo section is completely off-screen (saves GPU during parallax scroll)
+  const io = new IntersectionObserver(
+    ([entry]) => { offscreen = !entry.isIntersecting; },
+    { threshold: 0 }
+  );
+  io.observe(host);
+
   function animate(now: number) {
-    if (stopped || document.hidden) return;
+    if (stopped || document.hidden || offscreen) {
+      frame = requestAnimationFrame(animate);
+      return;
+    }
     const dt = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
     previous = now;
     elapsed += dt;
@@ -256,9 +268,8 @@ export async function createLogoScene(host: HTMLDivElement, url: string, onError
     pointer.lerp(desiredPointer, 1 - Math.exp(-dt * 3.7));
     const progress = Math.min(elapsed / 8, 1);
     const reveal = clamp((progress - 0.45) / 0.2, 0, 1);
-    const pulse = Math.max(0, 1 - Math.abs((progress - 0.7) / 0.15));
-    edge.opacity = reveal * 0.95;
-    glow.opacity = pulse * 0.06;
+    edge.opacity = reveal * 1.0;
+    glow.opacity = 0;
     logo.position.set(pointer.x, pointer.y, 0);
     assembly.visible = reveal < 0.84;
     renderer.render(scene, camera);
@@ -290,6 +301,7 @@ export async function createLogoScene(host: HTMLDivElement, url: string, onError
   function dispose() {
     stopped = true;
     cancelAnimationFrame(frame);
+    io.disconnect();
     observer.disconnect();
     host.removeEventListener('pointermove', move);
     host.removeEventListener('pointerleave', leave);
