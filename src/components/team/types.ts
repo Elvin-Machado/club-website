@@ -2,7 +2,7 @@ export interface CoreMember {
   id: string;
   name: string;
   role: string;
-  image: string;
+  image?: string;
   bio?: string;
   socials?: { twitter?: string; linkedin?: string; instagram?: string; email?: string };
 }

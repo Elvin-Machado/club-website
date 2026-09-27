@@ -43,7 +43,7 @@ export default function TeamShowcase({ clubName, core, members }: TeamShowcasePr
     window.addEventListener('keydown', escape);
     return () => window.removeEventListener('keydown', escape);
   }, []);
-  if (core.length !== 8) throw new Error('TeamShowcase requires exactly 8 core members.');
+  if (core.length < 2 || core.length > 16) throw new Error('TeamShowcase requires 2–16 core members.');
 
   return <div className="team-showcase" data-reduced-motion={capabilities.reducedMotion}>
     <a className="team-skip-link" href="#core-team">Skip to the team</a>

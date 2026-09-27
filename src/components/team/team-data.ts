@@ -1,27 +1,91 @@
 import type { ClubMember, CoreMember } from './types';
 
-// Demonstration data only: replace these fictional names and stock portraits
-// with the club's approved directory. The existing API directory is unchanged.
+// Real club directory, sourced from shared/public-data.json.
+//
+// No member photographs exist in the codebase, so `image` is intentionally
+// unset everywhere and the UI falls back to initials (see MemberPhoto). Add a
+// photo path per person as real portraits become available.
+//
+// The System Design seat is currently vacant in the source data; it is listed
+// so the orbit shows the full set of twelve leadership roles.
 export const exampleCore: CoreMember[] = [
-  { id: 'aarav', name: 'Aarav Menon', role: 'President', image: '/team/portrait-1.jpg', bio: 'Connecting curious minds and giving ambitious ideas a place to begin.' },
-  { id: 'ananya', name: 'Ananya Rao', role: 'Vice President', image: '/team/portrait-2.jpg', bio: 'A little structure, a lot of possibility. Making room for everyone to grow.' },
-  { id: 'ishaan', name: 'Ishaan Shah', role: 'Tech Lead', image: '/team/portrait-3.jpg', bio: 'Turning late-night what-ifs into things people can actually use.' },
-  { id: 'diya', name: 'Diya Nair', role: 'Design Lead', image: '/team/portrait-4.jpg', bio: 'Finding the feeling behind the interface, one thoughtful detail at a time.' },
-  { id: 'rohan', name: 'Rohan D’Souza', role: 'Events Lead', image: '/team/portrait-5.jpg', bio: 'Building experiences that start conversations and turn strangers into friends.' },
-  { id: 'meera', name: 'Meera Iyer', role: 'Outreach Lead', image: '/team/portrait-6.jpg', bio: 'Good things happen when the right people find each other.' },
-  { id: 'kabir', name: 'Kabir Das', role: 'Content Lead', image: '/team/portrait-7.jpg', bio: 'Collecting the stories, small discoveries, and big moments that make us Nucleus.' },
-  { id: 'tara', name: 'Tara Shetty', role: 'Operations Lead', image: '/team/portrait-8.jpg', bio: 'Taking care of the details so the whole community can keep moving.' },
+  {
+    id: 'poorvik',
+    name: 'Poorvik Kuthyala',
+    role: 'President',
+    bio: 'Helps shape the direction of Nucleus, connects the team around a shared purpose, and makes space for ideas to become meaningful work.',
+  },
+  {
+    id: 'dinol',
+    name: 'Dinol Castelino',
+    role: 'Vice President',
+    bio: 'Connects people and plans across the club, supports the core team, and helps keep our shared goals moving forward.',
+  },
+  {
+    id: 'joylin',
+    name: 'Joylin Mathias',
+    role: 'Secretary',
+    bio: 'Keeps the club connected through clear communication, organised records, and the coordination that helps each initiative run smoothly.',
+  },
+  {
+    id: 'prajwal',
+    name: 'Prajwal Gaonkar',
+    role: 'Tech Lead',
+    bio: 'Guides the technical direction of our work, brings builders together, and helps the team turn ambitious ideas into practical projects.',
+  },
+  {
+    id: 'mohit',
+    name: 'Mohit',
+    role: 'AI & ML Lead',
+    bio: 'Helps our AI and machine learning community explore models, ask better questions, and learn through experiments and shared discovery.',
+  },
+  {
+    id: 'rakshith',
+    name: 'Rakshith Dsouza',
+    role: 'Dev Lead',
+    bio: 'Connects design with development, guides collaborative builds, and helps members create useful digital experiences from the ground up.',
+  },
+  {
+    id: 'navya',
+    name: 'Navya Suvarna',
+    role: 'DSA Lead',
+    bio: 'Helps members strengthen their problem-solving foundations through algorithms, peer practice, and conversations about how and why a solution works.',
+  },
+  {
+    id: 'system-design-lead',
+    name: 'To be announced',
+    role: 'System Design Lead',
+    bio: 'Will guide exploration of architecture, connected services, and the trade-offs behind reliable systems, from a simple sketch to the bigger picture.',
+  },
+  {
+    id: 'karthik',
+    name: 'Karthik',
+    role: 'Treasurer',
+    bio: "Looks after the club's finances, helps plan resources responsibly, and supports the decisions that make our activities possible.",
+  },
+  {
+    id: 'deona',
+    name: 'Deona Rego',
+    role: 'Event Lead',
+    bio: 'Brings people together through club experiences, coordinating the details that turn a shared idea into a gathering of curious minds.',
+  },
+  {
+    id: 'nishanth',
+    name: 'Nishanth Uday Naik',
+    role: 'Planning & Strategy Lead',
+    bio: "Connects today's ideas with tomorrow's opportunities, shapes action plans, and helps the team move towards clear, achievable goals.",
+  },
+  {
+    id: 'sweedan',
+    name: 'Sweedan Cardoza',
+    role: 'Media Lead',
+    bio: 'Helps tell the Nucleus story through visuals, updates, and the moments we share, connecting what happens inside the club with the wider community.',
+  },
 ];
 
-const groups = [
-  { team: 'Tech', role: 'Developer', names: ['Aditya Bhat', 'Nisha Fernandes', 'Arjun Kumar', 'Sana Ali', 'Vikram Pai'] },
-  { team: 'Design', role: 'Designer', names: ['Aisha Khan', 'Devika Jain', 'Neel Rao', 'Riya Thomas', 'Yash Hegde'] },
-  { team: 'Events', role: 'Event Coordinator', names: ['Akash Shetty', 'Ira D’Souza', 'Kiran Prabhu', 'Maya Joseph', 'Pranav Nair'] },
-  { team: 'Outreach', role: 'Community Partner', names: ['Anika Das', 'Dhruv Menon', 'Lena Rodrigues', 'Omar Ahmed', 'Sia Kamath'] },
-  { team: 'Content', role: 'Storyteller', names: ['Avni Shah', 'Joel Pinto', 'Kiara D’Costa', 'Rahul Iyer', 'Zoya Malik'] },
-  { team: 'Ops', role: 'Operations', names: ['Aditi Shenoy', 'Ethan D’Souza', 'Lavanya Rao', 'Rehan Khan', 'Tanvi Bhat'] },
+export const exampleMembers: ClubMember[] = [
+  { id: 'manvitha', name: 'Manvitha Lewis', role: 'Discipline Head', team: 'Operations' },
+  { id: 'salim', name: 'Salim Pallikal', role: 'Member', team: 'Community' },
+  { id: 'nikhitha', name: 'Nikhitha Dsouza', role: 'Member', team: 'Community' },
+  { id: 'saniya', name: 'Aisahath Saniya', role: 'Member', team: 'Community' },
 ];
-export const exampleMembers: ClubMember[] = groups.flatMap((group, groupIndex) => group.names.map((name, index) => ({
-  id: `${group.team.toLowerCase()}-${index + 1}`, name, role: group.role, team: group.team,
-  image: `/team/portrait-${(groupIndex * 5 + index) % 8 + 1}.jpg`,
-})));

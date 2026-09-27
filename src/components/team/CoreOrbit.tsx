@@ -19,13 +19,13 @@ interface OrbitProps {
   active: boolean;
 }
 
-function Planet({ member, index, total, onSelect, frozen }: { member: CoreMember; index: number; total: number; onSelect: (member: CoreMember, position: Vector3) => void; frozen: boolean }) {
+function Planet({ member, index, total, onSelect, frozen, radius }: { member: CoreMember; index: number; total: number; onSelect: (member: CoreMember, position: Vector3) => void; frozen: boolean; radius: number }) {
   const mesh = useRef<Mesh>(null);
   const [hovered, setHovered] = useState(false);
   const angle = index / total * Math.PI * 2 + 0.2;
   const select = () => { if (mesh.current && !frozen) onSelect(member, mesh.current.getWorldPosition(new Vector3())); };
   function click(event: ThreeEvent<MouseEvent>) { event.stopPropagation(); if (event.delta < 5) select(); }
-  return <group position={[Math.cos(angle) * 4.6, 0, Math.sin(angle) * 4.6]}>
+  return <group position={[Math.cos(angle) * radius, 0, Math.sin(angle) * radius]}>
     <mesh ref={mesh} onClick={click} onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)}>
       <sphereGeometry args={[hovered ? 0.17 : 0.13, 24, 16]} /><meshBasicMaterial color={hovered ? '#ffffff' : '#b6efd3'} />
     </mesh>
@@ -40,6 +40,7 @@ function Planet({ member, index, total, onSelect, frozen }: { member: CoreMember
 }
 
 function OrbitWorld({ core, selectedId, onSelect, onFocused, paused, resetKey }: OrbitProps & { paused: boolean; resetKey: number }) {
+  const radius = core.length <= 8 ? 4.6 : 5.8;
   const group = useRef<Group>(null);
   const controls = useRef<OrbitControlsImpl>(null);
   const { camera, clock } = useThree();
@@ -52,7 +53,7 @@ function OrbitWorld({ core, selectedId, onSelect, onFocused, paused, resetKey }:
   const notified = useRef(false);
   const idleAt = useRef(0);
   const currentSelection = useRef<string | null>(null);
-  const points = useMemo(() => Array.from({ length: 193 }, (_, i): [number, number, number] => { const angle = i / 192 * Math.PI * 2; return [Math.cos(angle) * 4.6, 0, Math.sin(angle) * 4.6]; }), []);
+  const points = useMemo(() => Array.from({ length: 193 }, (_, i): [number, number, number] => { const angle = i / 192 * Math.PI * 2; return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius]; }), [radius]);
   const inner = useMemo(() => points.map(([x, y, z]): [number, number, number] => [x * 0.89, y, z * 0.89]), [points]);
   const destination = useMemo(() => new Vector3(), []);
   const lookTarget = useMemo(() => new Vector3(), []);
@@ -100,7 +101,7 @@ function OrbitWorld({ core, selectedId, onSelect, onFocused, paused, resetKey }:
     <group ref={group}>
       <Line points={points} color="#b6efd3" transparent opacity={0.26} lineWidth={0.8} />
       <Line points={inner} color="#b6efd3" transparent opacity={0.09} lineWidth={0.65} dashed dashSize={0.055} gapSize={0.12} />
-      {core.map((member, index) => <Planet key={member.id} member={member} index={index} total={core.length} frozen={Boolean(selectedId)} onSelect={(person, position) => { focusPoint.current.copy(position); onSelect(person); }} />)}
+      {core.map((member, index) => <Planet key={member.id} member={member} index={index} total={core.length} frozen={Boolean(selectedId)} radius={radius} onSelect={(person, position) => { focusPoint.current.copy(position); onSelect(person); }} />)}
     </group>
     <Html center position={[0, 0, 0]} zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}><div className="orbit-emblem"><Image src="/brain-mark.svg" alt="Nucleus emblem" width={80} height={80} /><span>NUCLEUS</span><small>OUR COMMON CENTRE</small></div></Html>
     <OrbitControls ref={controls} enabled={!selectedId} enableZoom={false} enablePan={false} enableDamping dampingFactor={0.07} rotateSpeed={0.4} minPolarAngle={0.5} maxPolarAngle={1.12} onStart={() => { idleAt.current = Infinity; }} onEnd={() => { idleAt.current = clock.elapsedTime + 3; }} />

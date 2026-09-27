@@ -17,7 +17,7 @@ A full-stack club website for the Nucleus student innovation community at St. Jo
 │   ├── components/
 │   │   ├── team/                     Team constellation components
 │   │   │   ├── GalaxyHero.tsx          R3F starfield + letterbox + film grain
-│   │   │   ├── CoreOrbit.tsx           Desktop 3D orbit ring (8 nodes)
+│   │   │   ├── CoreOrbit.tsx           Desktop 3D orbit ring (12 nodes)
 │   │   │   ├── CoreCarousel.tsx        Mobile swipe carousel fallback
 │   │   │   ├── MemberProfileOverlay.tsx Modal dialog for core profiles
 │   │   │   ├── RosterSection.tsx       Searchable grouped credits-roll
@@ -95,7 +95,7 @@ npm start             # Express API (port 3001) + Next.js (port 3000)
 
 | Route | Framework | Description |
 |-------|-----------|-------------|
-| `/team` | Next.js | Cinematic team page: R3F starfield, 3D orbit (8 core), profile overlays, searchable roster (30 members across 6 teams) |
+| `/team` | Next.js | Cinematic team page: R3F starfield, 3D orbit (12 core roles), profile overlays, searchable roster (4 members across 2 teams) |
 | `/` | Vite | Three.js particle logo landing + domain parallax |
 | `/about` | Vite | Domain cards with detail panels |
 | `/events` | Vite | Three.js event coaster ride |

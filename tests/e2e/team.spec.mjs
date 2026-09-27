@@ -30,12 +30,12 @@ test('the scroll cue is present and the letterbox frames the hero', async ({ pag
 
 // --- Roster -----------------------------------------------------------------
 
-test('the roster lists 30 members grouped into 6 teams', async ({ page }) => {
+test('the roster lists 4 members grouped into 2 teams', async ({ page }) => {
   await page.goto(TEAM);
   const rows = page.locator('.roster-row');
-  await expect(rows).toHaveCount(30);
-  await expect(page.locator('.roster-group')).toHaveCount(6);
-  await expect(page.locator('.roster-result-count')).toContainText('30');
+  await expect(rows).toHaveCount(4);
+  await expect(page.locator('.roster-group')).toHaveCount(2);
+  await expect(page.locator('.roster-result-count')).toContainText('04');
 });
 
 test('search filters the roster by name, by team, and clears again', async ({ page }) => {
@@ -44,24 +44,24 @@ test('search filters the roster by name, by team, and clears again', async ({ pa
   const search = page.locator('#roster-search');
   await search.scrollIntoViewIfNeeded();
 
-  await search.fill('aditya');
+  await search.fill('salim');
   await expect(rows).toHaveCount(1);
-  await expect(rows.first().locator('.roster-name')).toContainText('Aditya');
+  await expect(rows.first().locator('.roster-name')).toContainText('Salim');
 
-  // A team name matches all five of that team's members.
-  await search.fill('Tech');
-  await expect(rows).toHaveCount(5);
+  // A team name matches all three of that team's members.
+  await search.fill('Community');
+  await expect(rows).toHaveCount(3);
 
   // Terms combine, so a name plus its team narrows to one.
-  await search.fill('aditya tech');
+  await search.fill('salim community');
   await expect(rows).toHaveCount(1);
 
-  // An unknown name empties the roster and says so.
+  // An unknown name empties the roster.
   await search.fill('zzzz-nobody');
   await expect(rows).toHaveCount(0);
 
   await page.locator('.roster-clear').click();
-  await expect(rows).toHaveCount(30);
+  await expect(rows).toHaveCount(4);
 });
 
 test('team filter chips narrow the roster and mark themselves pressed', async ({ page }) => {
@@ -69,25 +69,29 @@ test('team filter chips narrow the roster and mark themselves pressed', async ({
   const rows = page.locator('.roster-row');
   await page.locator('.roster-filters').scrollIntoViewIfNeeded();
 
-  const design = page.locator('.roster-filters button', { hasText: 'Design' });
-  await design.click();
-  await expect(design).toHaveAttribute('aria-pressed', 'true');
-  await expect(rows).toHaveCount(5);
+  const community = page.locator('.roster-filters button', { hasText: 'Community' });
+  await community.click();
+  await expect(community).toHaveAttribute('aria-pressed', 'true');
+  await expect(rows).toHaveCount(3);
 
   await page.locator('.roster-filters button', { hasText: 'All teams' }).click();
-  await expect(rows).toHaveCount(30);
+  await expect(rows).toHaveCount(4);
 });
 
-test('a roster row reveals a circular portrait on hover', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'portrait reveal is a hover affordance');
+test('roster rows are typographic only until real portraits are added', async ({ page }) => {
   await page.goto(TEAM);
-
   const row = page.locator('.roster-row').first();
   await row.scrollIntoViewIfNeeded();
-  await expect(row.locator('img')).toHaveCount(0);
 
-  await row.hover();
-  await expect(row.locator('img')).toBeVisible();
+  // No member photographs exist in the source data, so rows stay clean
+  // name+role text. MemberRow upgrades to a reveal-on-hover button only when
+  // a member has an image (see MemberRow in RosterSection).
+  await expect(row).toBeVisible();
+  await expect(row.locator('.roster-name')).toBeVisible();
+  await expect(row.locator('.roster-role')).toBeVisible();
+  await expect(page.locator('.roster-row img')).toHaveCount(0);
+  // A row without a photo is a plain div, not an interactive button.
+  await expect(page.locator('.roster-row[aria-pressed]')).toHaveCount(0);
 });
 
 // --- Core: responsive switch ------------------------------------------------
@@ -99,8 +103,8 @@ test('mobile shows the carousel instead of the 3D orbit', async ({ page, isMobil
   const carousel = page.locator('.core-carousel');
   await expect(carousel).toBeVisible();
   await expect(page.locator('.core-carousel-slide').first()).toBeVisible();
-  // Exactly 8 core profiles, matching the data contract.
-  await expect(page.locator('.core-carousel-slide')).toHaveCount(8);
+  // Exactly 12 core profiles, matching the data contract.
+  await expect(page.locator('.core-carousel-slide')).toHaveCount(12);
 });
 
 test('mobile carousel pages with its controls', async ({ page, isMobile }) => {
@@ -162,7 +166,7 @@ test('reduced motion skips the WebGL canvas and still renders content', async ({
 
   // The hero and roster are complete without any 3D scene.
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Nucleus');
-  await expect(page.locator('.roster-row')).toHaveCount(30);
+  await expect(page.locator('.roster-row')).toHaveCount(4);
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 

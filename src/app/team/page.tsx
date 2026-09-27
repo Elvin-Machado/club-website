@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: 'Different minds. One gravitational pull. Meet the core and the constellation behind Nucleus SJEC.',
 };
 
-// Example directory: 8 fictional core profiles and 30 members across 6 teams.
-// Replace these imports with approved data conforming to TeamShowcaseProps.
+// Real club directory, sourced from shared/public-data.json:
+// 12 core roles plus the wider roster grouped by team.
 export default function TeamPage() {
   return <TeamShowcase clubName="Nucleus" core={exampleCore} members={exampleMembers} />;
 }
