@@ -1,9 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Edit3, LoaderCircle, LogOut, Plus, Save, Trash2, Users } from 'lucide-react';
-import { Logo } from './components/Logo';
-import Modal from './components/Modal';
-import { api } from './api';
-import type { Application, SiteData } from './types';
+import { Logo } from '../components/shared/Logo';
+import Modal from '../components/shared/Modal';
+import { api } from '../api';
+import type { Application, SiteData } from '../types';
 import './admin.css';
 
 type Session = { email: string; csrf: string };

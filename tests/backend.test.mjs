@@ -93,7 +93,7 @@ test('database content survives a close and reopen without reseeding over edits'
     assert.equal(getSite(db).settings.cycle, 'persisted-intake'); assert.equal(getSite(db).events.length, 3);
   } finally { db?.close(); rmSync(directory, { recursive: true, force: true }); }
 });
-test('production renders a logo-only landing, preserves club routes, escapes data, and hides admin from indexing', async () => {
+test('production renders the animated home and club pages, escapes data, and hides admin from indexing', async () => {
   if (!existsSync('dist/server/entry-server.js')) return;
   const { render } = await import('../dist/server/entry-server.js');
   await fixture(async ({ base, db }) => {
@@ -103,11 +103,19 @@ test('production renders a logo-only landing, preserves club routes, escapes dat
     assert.equal(response.status, 200);
     const home = html.match(/<div id="root">([\s\S]*?)<script id="nucleus-data"/)?.[1];
     assert.ok(home); assert.match(home, /class="logo-landing"/); assert.match(home, /NucleusLogo_transparent[^" ]*\.png/);
-    assert.doesNotMatch(home, /<(?:header|footer|nav|button|h1|section)\b|Curiosity is|Join Nucleus/);
+    assert.match(home, /aria-label="Main navigation"/); assert.match(home, /class="dp-section"/);
+    assert.match(home, /class="mu-morph-wrap/); assert.match(home, /community-section--reveal/);
+    assert.doesNotMatch(home, /class="home-links/);
     assert.doesNotMatch(html, /Enable JavaScript to explore events and apply/);
     assert.match(html, /Updated from the database/); assert.match(html, /application\/ld\+json/);
     const about = await fetch(`${base}/about`).then(r => r.text());
-    assert.match(about, /A meeting of minds/); assert.match(about, /Data Structures/); assert.match(about, /site-header/);
+    assert.match(about, /A meeting/); assert.match(about, /of minds/); assert.match(about, /Data Structures/); assert.match(about, /site-header/);
+    const work = await fetch(`${base}/projects`).then(r => r.text());
+    assert.match(work, /work-feature/); assert.match(work, /i Laundroid/);
+    const team = await fetch(`${base}/team`).then(r => r.text());
+    for (const member of getSite(db).team) assert.ok(team.includes(member.name));
+    const recruitment = await fetch(`${base}/recruitment`);
+    assert.equal(recruitment.status, 200); assert.match(await recruitment.text(), /recruitment-page/);
     assert.ok(!html.includes('</script><script>alert(1)</script>')); assert.match(html, /id="nucleus-data"/);
     const admin = await fetch(`${base}/admin`).then(r => r.text()); assert.match(admin, /noindex,nofollow/); assert.ok(!admin.includes('Updated from the database'));
     assert.equal((await fetch(`${base}/does-not-exist`)).status, 404);

@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles.css';
 
-const Admin = lazy(() => import('./Admin'));
+const Admin = lazy(() => import('./pages/Admin'));
 const root = document.getElementById('root')!;
 const initial = document.getElementById('nucleus-data');
 const element = <React.StrictMode>{window.location.pathname.startsWith('/admin')

@@ -234,10 +234,11 @@ export async function createLogoScene(host: HTMLDivElement, url: string, onError
     const width = host.clientWidth, height = host.clientHeight;
     if (!width || !height) return;
     const pixelRatio = Math.min(window.devicePixelRatio || 1, width < 768 ? 1.5 : 2);
-    const logoPixels = Math.min(560, width * 0.7, height * 0.677);
+    const logoPixels = Math.min(480, width * 0.6, height * 0.55);
     viewport.set(width / logoPixels * LOGO_WIDTH, height / logoPixels * LOGO_WIDTH);
     camera.aspect = width / height;
     camera.position.z = viewport.y / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    camera.position.y = -0.07 * viewport.y;
     camera.updateProjectionMatrix();
     uniforms.uCameraZ.value = camera.position.z;
     uniforms.uPixelRatio.value = pixelRatio;
@@ -251,14 +252,19 @@ export async function createLogoScene(host: HTMLDivElement, url: string, onError
 
   // Stop rendering when the logo section is completely off-screen (saves GPU during parallax scroll)
   const io = new IntersectionObserver(
-    ([entry]) => { offscreen = !entry.isIntersecting; },
+    ([entry]) => {
+      offscreen = !entry.isIntersecting;
+      cancelAnimationFrame(frame);
+      previous = 0;
+      if (!offscreen && !stopped && !document.hidden) frame = requestAnimationFrame(animate);
+    },
     { threshold: 0 }
   );
   io.observe(host);
 
   function animate(now: number) {
     if (stopped || document.hidden || offscreen) {
-      frame = requestAnimationFrame(animate);
+      frame = 0;
       return;
     }
     const dt = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
@@ -288,7 +294,7 @@ export async function createLogoScene(host: HTMLDivElement, url: string, onError
   const visibility = () => {
     cancelAnimationFrame(frame);
     previous = 0;
-    if (!document.hidden && !stopped) frame = requestAnimationFrame(animate);
+    if (!document.hidden && !stopped && !offscreen) frame = requestAnimationFrame(animate);
   };
   const contextLost = (event: Event) => {
     event.preventDefault();
