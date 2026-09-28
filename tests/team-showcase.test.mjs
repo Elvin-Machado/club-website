@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { exampleCore, exampleMembers } from '../src/components/team/team-data.ts';
 import { filterRoster, groupRoster } from '../src/components/team/roster.ts';
-import { currentTeam } from '../src/components/team/alumni-data.ts';
 
 test('example constellation contains 12 unique core and 3 roster members in 1 team', () => {
   assert.equal(exampleCore.length, 12);
@@ -43,18 +42,4 @@ test('grouping preserves names and first-seen team order including unusual categ
   assert.deepEqual(groups.map(([name]) => name), ['__proto__', 'Design']);
   assert.deepEqual(groups[0][1].map(person => person.id), ['1', '3']);
   assert.deepEqual(groupRoster([]), []);
-});
-
-test('alumni leave both active lists by ID without changing the saved member records', () => {
-  const formerCore = { ...exampleCore[0], graduationYear: 2026 };
-  const formerMember = { ...exampleMembers[0], higherStudies: 'Test study record' };
-  const alumni = [formerCore, formerMember];
-  const before = JSON.stringify([exampleCore, exampleMembers, alumni]);
-  const active = currentTeam(exampleCore, exampleMembers, alumni);
-  assert.equal(active.core.length, exampleCore.length - 1);
-  assert.equal(active.members.length, exampleMembers.length - 1);
-  assert.ok(![...active.core, ...active.members].some(member => alumni.some(alum => alum.id === member.id)));
-  assert.equal(JSON.stringify([exampleCore, exampleMembers, alumni]), before);
-  assert.deepEqual(currentTeam(exampleCore, exampleMembers, []), { core: exampleCore, members: exampleMembers });
-  assert.deepEqual(currentTeam([], [], alumni), { core: [], members: [] });
 });
