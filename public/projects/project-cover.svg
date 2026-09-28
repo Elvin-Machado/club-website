@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="640" viewBox="0 0 800 640" fill="none">
+  <defs>
+    <radialGradient id="bg"><stop stop-color="#426C5D"/><stop offset="1" stop-color="#142F28"/></radialGradient>
+    <linearGradient id="tile" x1="246" y1="174" x2="526" y2="429" gradientUnits="userSpaceOnUse"><stop stop-color="#D9EFCC"/><stop offset="1" stop-color="#7EAA8C"/></linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" stroke="#D4F2CB" stroke-opacity=".045"/></pattern>
+    <filter id="shadow"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h800v640H0z"/><path fill="url(#grid)" d="M0 0h800v640H0z"/>
+  <ellipse cx="412" cy="511" rx="185" ry="23" fill="#071D16" opacity=".6" filter="url(#shadow)"/>
+  <circle cx="400" cy="320" r="232" stroke="#C4E8CB" stroke-opacity=".12"/>
+  <circle cx="400" cy="320" r="255" stroke="#C4E8CB" stroke-opacity=".08" stroke-dasharray="3 12"/>
+  <path d="m223 351 205-105 174 125v42L397 521 223 394z" fill="#315D4A" stroke="#81B292" stroke-opacity=".6"/>
+  <path d="m223 351 205-105 174 125-205 108z" fill="#547F60" stroke="#9BC5A0" stroke-opacity=".7"/>
+  <path d="m223 298 205-105 174 125v25L397 453 223 328z" fill="#466C52" stroke="#9BC5A0" stroke-opacity=".6"/>
+  <path d="m223 298 205-105 174 125-205 110z" fill="#8BB294" stroke="#C1DFB6"/>
+  <path d="m223 230 205-105 174 125v27L397 385 223 260z" fill="#789D79" stroke="#BAD6AD"/>
+  <path d="m223 230 205-105 174 125-205 108z" fill="url(#tile)" stroke="#D5E7C6" stroke-width="2"/>
+  <g stroke="#345D47" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="m352 222-38 18 35 24m113-45 35 25-38 18m-56-65-20 78"/></g>
+  <path d="M179 362h-33v-53m475-145h32v47m-449-30h22m-11-11v22m387 257h22m-11-11v22" stroke="#BFDFBE" stroke-opacity=".45"/>
+  <g stroke="#B5DDBE" stroke-opacity=".45"><circle cx="162" cy="265" r="8"/><circle cx="647" cy="310" r="8"/><circle cx="487" cy="534" r="7"/><path d="M171 265h39m428 45h-22M487 526v-43" stroke-dasharray="4 6"/></g>
+</svg>

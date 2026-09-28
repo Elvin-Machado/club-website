@@ -1,4 +1,4 @@
-.team-showcase,.team-profile{--team-accent:#b6efd3;--team-muted:#929297;--team-line:#ffffff16;font-family:Inter,Arial,sans-serif;color:#fafafa;background:#000;font-size:14px;line-height:1.5;color-scheme:dark;-webkit-font-smoothing:antialiased}
+.team-showcase,.team-profile{--team-accent:#b6efd3;--team-muted:#929297;--team-line:#ffffff16;--team-bg:#080d12;font-family:Inter,Arial,sans-serif;color:#fafafa;background:var(--team-bg);font-size:14px;line-height:1.5;color-scheme:dark;-webkit-font-smoothing:antialiased}
 .team-showcase{position:relative;isolation:isolate;overflow:clip}
 .team-showcase *,.team-profile *{box-sizing:border-box}
 .team-showcase :is(h1,h2,h3,p),.team-profile :is(h2,p){margin:0}
@@ -27,7 +27,7 @@
 .team-menu-toggle{display:none}
 
 /* The first frame stays complete while the canvas is loading or unavailable. */
-.galaxy-hero{position:relative;min-height:790px;height:100svh;max-height:1200px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000}
+.galaxy-hero{position:relative;min-height:790px;height:100svh;max-height:1200px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--team-bg)}
 .galaxy-backdrop{position:absolute;inset:4.5vh 0;background:url('/team/starfield.svg') center/cover;opacity:.85}
 .galaxy-backdrop>div{width:100%;height:100%}
 .galaxy-aura{position:absolute;inset:7% 0;background:radial-gradient(ellipse at 50% 48%,#b6efd30b,transparent 46%);pointer-events:none}
@@ -36,7 +36,7 @@
 .galaxy-orbital-lines .galaxy-crosshair{stroke-opacity:.055;stroke-dasharray:2 9}
 .galaxy-orbital-lines .galaxy-beacon{fill:var(--team-accent);stroke:none;filter:drop-shadow(0 0 7px #b6efd3)}
 .galaxy-grain{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.87' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' opacity='.4' d='M0 0h180v180H0z'/%3E%3C/svg%3E");opacity:.04;pointer-events:none;z-index:4}
-.galaxy-letterbox{position:absolute;left:0;right:0;height:4.5vh;background:#000;z-index:5;pointer-events:none}
+.galaxy-letterbox{position:absolute;left:0;right:0;height:4.5vh;background:var(--team-bg);z-index:5;pointer-events:none}
 .galaxy-letterbox-top{top:0}.galaxy-letterbox-bottom{bottom:0}
 .galaxy-copy{position:relative;z-index:6;width:100%;padding:58px 24px 0;text-align:center}
 .team-showcase .galaxy-kicker{justify-content:center;color:#b4b4b8;font-size:9px;letter-spacing:.22em;margin-bottom:33px}
@@ -58,7 +58,7 @@
 .galaxy-chapter{display:flex;align-items:center;gap:9px;font-size:7px;color:#8f8f94;letter-spacing:.11em}.galaxy-chapter i{width:24px;height:1px;background:#ffffff26}
 
 .team-section{padding:0 7.5%;scroll-margin-top:25px}
-.team-showcase .core-section{padding-top:90px;border-top:1px solid var(--team-line);background:#000}
+.team-showcase .core-section{padding-top:90px;border-top:1px solid var(--team-line);background:var(--team-bg)}
 .team-section-top{display:flex;align-items:center;justify-content:space-between;gap:20px}
 .team-section-index{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border:1px solid #ffffff24;border-radius:50%;font-size:8px;letter-spacing:0;color:var(--team-muted);margin-right:3px}
 .team-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-top:43px}
@@ -100,7 +100,7 @@
 
 .roster-section{padding-top:140px;padding-bottom:90px}
 .roster-section .team-section-heading{margin-bottom:48px}
-.roster-toolbar{position:sticky;top:0;z-index:30;background:#000000f2;backdrop-filter:blur(16px);padding-top:14px;border-bottom:1px solid #ffffff24}
+.roster-toolbar{position:sticky;top:0;z-index:30;background:#080d12f2;backdrop-filter:blur(16px);padding-top:14px;border-bottom:1px solid #ffffff24}
 .roster-search{display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--team-line);min-height:64px}.roster-search>svg{color:#71717a;flex:none}
 .team-showcase .roster-search input{font:inherit;font-size:13px;line-height:1.5;background:none;border:0;border-radius:0;width:100%;color:#fff;outline:none;box-shadow:none;padding:16px 4px;margin:0}.roster-search input::placeholder{color:#777780}.roster-search input::-webkit-search-cancel-button{display:none}
 .roster-search:focus-within{border-bottom-color:var(--team-accent)}.roster-search input:focus-visible{outline:0}
@@ -121,8 +121,8 @@
 
 /* A native dialog provides focus containment, Escape, and background inertness. */
 .team-profile{position:fixed;inset:0;z-index:100;width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;overflow-y:auto;overscroll-behavior:contain}
-.team-profile::backdrop{background:#000}
-.profile-surface{position:relative;min-height:100svh;overflow:hidden;background:#000}
+.team-profile::backdrop{background:#030709e0;backdrop-filter:blur(6px)}
+.profile-surface{position:relative;min-height:100svh;overflow:hidden;background:var(--team-bg)}
 .profile-portrait{position:absolute;inset:0 0 0 36%;background:#141917}.profile-portrait .member-photo{object-position:center 35%;opacity:.82}.profile-portrait .member-photo-initials{font-size:18vw}
 .profile-photo-shade{position:absolute;inset:0;background:linear-gradient(90deg,#000,transparent 55%),linear-gradient(0deg,#000b,transparent 55%)}
 .profile-topline{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:32px 5.5%;color:#a1a1aa}.profile-close{display:flex;align-items:center;gap:20px;min-height:44px;background:none;border:0;font-size:9px!important;letter-spacing:.16em}.profile-close svg{color:#fff}
@@ -140,3 +140,118 @@
 }
 @media(max-width:360px){.team-header-link{display:none}.team-menu-toggle{margin-left:auto}.team-showcase .galaxy-kicker{font-size:6px}.roster-role{max-width:95px;text-align:right;white-space:normal}.carousel-dots button{width:14px}.team-showcase .team-invitation-section h2{font-size:33px}}
 @media(prefers-reduced-motion:reduce){.team-showcase *,.team-profile *{animation:none!important;transition-duration:0s!important;scroll-behavior:auto!important}.galaxy-orbital-lines{opacity:.65}}
+
+/* ==========================================================================
+   UNIFIED CONSTELLATION — hero + orbit merged into one composition
+   Background matches the rest of the site (#080d12), never pure black.
+   ========================================================================== */
+
+.constellation-section{position:relative;min-height:820px;height:100svh;max-height:1240px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg,#080d12);isolation:isolate}
+
+.constellation-bg{position:absolute;inset:0;z-index:0;background:url('/team/starfield.svg') center/cover;opacity:.7}
+.constellation-bg>div{width:100%;height:100%}
+.constellation-bg canvas{width:100%!important;height:100%!important}
+
+/* The orbit sits above the starfield, below the title, and shares the frame. */
+.constellation-orbit{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.constellation-orbit>*{pointer-events:auto}
+.constellation-orbit .core-orbit{width:100%;height:100%}
+.constellation-orbit .orbit-space{height:100%;background:none}
+.constellation-orbit .orbit-space:before{display:none}
+
+/* The central NUCLEUS wordmark — the hub the members orbit.
+   Centred with flex, not a translate transform, so framer-motion's scroll
+   parallax (`y`) cannot clobber the centring. */
+.constellation-center{position:absolute;inset:0;z-index:3;padding:0 24px;text-align:center;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.constellation-kicker{justify-content:center;color:#b4b4b8;font-size:9px;letter-spacing:.22em;margin:0 0 clamp(16px,2.4vh,28px)}
+.constellation-center h1{font-size:clamp(58px,10.6vw,164px);line-height:.94;text-transform:uppercase;white-space:nowrap;letter-spacing:-.065em;font-weight:500;color:var(--mint,#b6efd3);text-shadow:0 0 60px #b6efd326,0 2px 30px #0006;display:flex;align-items:flex-start;justify-content:center;transform-origin:center}
+.galaxy-title-star{margin:4px 0 0 9px;font-size:.22em;letter-spacing:0;color:var(--team-accent,#b6efd3)}
+.constellation-tagline{font-size:clamp(17px,2vw,25px);line-height:1.5;letter-spacing:-.03em;color:#e5e5e5;margin:clamp(14px,2.2vh,24px) 0 0;max-width:22ch}
+
+.constellation-bottom{position:absolute;z-index:6;left:5.5%;right:5.5%;bottom:max(4.5vh,env(safe-area-inset-bottom));display:flex;align-items:flex-end;justify-content:space-between;gap:18px;pointer-events:none}
+.constellation-bottom>*{pointer-events:auto}
+
+/* Keep the title legible above the orbit without hiding the nodes. */
+.team-showcase[data-reduced-motion] .constellation-orbit .orbit-node-label{transition:none}
+
+/* ==========================================================================
+   MEMBER DECK — horizontal slide deck with depth
+   ========================================================================== */
+
+.member-deck{position:relative;padding:clamp(70px,10vh,130px) 0 clamp(50px,7vh,90px);background:var(--bg,#080d12)}
+.deck-viewport{position:relative;display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:clamp(26px,4vh,44px) max(5.5%,22px);perspective:1400px;touch-action:pan-y}
+.deck-viewport::-webkit-scrollbar{display:none}
+
+.deck-card{position:relative;flex:0 0 min(400px,74vw);min-height:clamp(400px,58vh,540px);scroll-snap-align:center;display:flex;flex-direction:column;gap:14px;padding:26px;border:1px solid #ffffff12;border-radius:3px;background:linear-gradient(165deg,#ffffff09,#ffffff02 46%,#b6efd305);box-shadow:0 30px 70px -40px #000,inset 0 1px 0 #ffffff0f;text-align:left;cursor:pointer;transform-style:preserve-3d;transition:border-color .35s,box-shadow .35s,background .35s;color:inherit;font:inherit;-webkit-tap-highlight-color:transparent}
+.deck-card:hover,.deck-card:focus-visible{border-color:#b6efd340;box-shadow:0 40px 90px -40px #000,0 0 0 1px #b6efd31f,inset 0 1px 0 #ffffff1a}
+.deck-card.is-active{border-color:#b6efd333}
+.deck-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#85858e;font-size:9px;letter-spacing:.16em}
+.deck-card-portrait{position:relative;flex:1;min-height:0;border-radius:2px;overflow:hidden;background:radial-gradient(circle at 50% 42%,#b6efd31a,#b6efd305 58%,transparent 74%);display:grid;place-items:center}
+.deck-card-name{font-size:clamp(22px,2.6vw,30px);line-height:1.12;letter-spacing:-.035em;font-weight:500;margin:0;color:#f4f4f5}
+.deck-card-role{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--team-accent,#b6efd3);margin:0}
+.deck-card-cta{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a1a1aa;margin-top:auto}
+
+.deck-controls{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:0 max(5.5%,22px)}
+.deck-nav{display:flex;gap:9px}
+.deck-explore-all{display:inline-flex;align-items:center;gap:9px;margin-left:auto;padding:12px 20px;border:1px solid #b6efd32e;border-radius:100px;background:#b6efd309;color:var(--team-accent,#b6efd3);font-size:10px;letter-spacing:.17em;text-transform:uppercase;cursor:pointer;transition:background .3s,border-color .3s,transform .3s}
+.deck-explore-all:hover,.deck-explore-all:focus-visible{background:#b6efd31a;border-color:#b6efd355;transform:translateY(-2px)}
+
+/* ==========================================================================
+   MEMBER GALLERY — full grid of every non-core member
+   ========================================================================== */
+
+.member-gallery{position:relative;padding:clamp(66px,9vh,120px) 0 clamp(58px,8vh,100px);background:linear-gradient(180deg,var(--bg,#080d12),#0b1118 42%,var(--bg,#080d12))}
+.gallery-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding:0 max(5.5%,22px);margin-bottom:clamp(28px,4vh,48px)}
+.gallery-header h2{font-size:clamp(30px,4.6vw,58px);line-height:1.02;letter-spacing:-.045em;font-weight:500;margin:14px 0 0;color:#f4f4f5}
+.gallery-close{flex-shrink:0}
+
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:16px;padding:0 max(5.5%,22px)}
+.gallery-card{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid #ffffff10;border-radius:3px;background:linear-gradient(168deg,#ffffff08,#ffffff02);text-align:left;cursor:pointer;color:inherit;font:inherit;transition:border-color .35s,transform .35s,box-shadow .35s;-webkit-tap-highlight-color:transparent}
+.gallery-card:hover,.gallery-card:focus-visible{border-color:#b6efd33d;transform:translateY(-4px);box-shadow:0 24px 50px -34px #000}
+.gallery-card-portrait{position:relative;aspect-ratio:1;border-radius:2px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#b6efd317,#b6efd304 60%,transparent 76%);display:grid;place-items:center}
+.gallery-card-info h3{font-size:16px;line-height:1.2;letter-spacing:-.02em;font-weight:500;margin:0 0 5px;color:#f4f4f5}
+.gallery-card-info p{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--team-accent,#b6efd3);margin:0}
+.gallery-card-arrow{position:absolute;top:16px;right:16px;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#ffffff0f;color:#d4d4d8;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s}
+.gallery-card:hover .gallery-card-arrow,.gallery-card:focus-visible .gallery-card-arrow{opacity:1;transform:translateY(0)}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width:1100px){
+  .constellation-section{min-height:760px}
+  .constellation-orbit .orbit-space{height:100%}
+}
+
+@media (max-width:767px){
+  .constellation-section{min-height:min(880px,100svh);padding-bottom:96px}
+  /* Lift the wordmark so the carousel below it keeps room. */
+  .constellation-center{justify-content:flex-start;padding:16vh 20px 0}
+  .constellation-center h1{font-size:clamp(46px,15.5vw,84px);white-space:normal}
+  .constellation-kicker{font-size:7px;letter-spacing:.16em;margin-bottom:18px}
+  .constellation-tagline{font-size:15px;margin-top:14px;max-width:20ch}
+  .galaxy-title-star{font-size:.2em;margin-left:5px}
+  .constellation-bottom{left:6%;right:6%;bottom:max(3vh,env(safe-area-inset-bottom));flex-wrap:wrap;gap:12px;justify-content:center}
+  .constellation-bottom .galaxy-coordinate{display:none}
+  .galaxy-counts{gap:20px}
+  .galaxy-counts b{font-size:19px}
+  .galaxy-scroll{position:static;transform:none;font-size:0;gap:0;order:-1;width:100%;display:flex;justify-content:center}
+  .galaxy-scroll>span{width:27px;height:39px}
+
+  .deck-card{flex-basis:min(310px,80vw);min-height:clamp(360px,54vh,440px);padding:20px}
+  .deck-controls{gap:12px;padding:0 6%}
+  .deck-explore-all{margin-left:0;width:100%;justify-content:center}
+
+  .gallery-grid{grid-template-columns:repeat(2,1fr);gap:11px;padding:0 6%}
+  .gallery-card{padding:12px;gap:10px}
+  .gallery-card-info h3{font-size:14px}
+  .gallery-header{padding:0 6%;flex-wrap:wrap}
+}
+
+@media (max-width:420px){
+  .gallery-grid{grid-template-columns:1fr}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .deck-card{transform:none!important}
+}

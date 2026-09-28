@@ -95,7 +95,7 @@ npm start             # Express API (port 3001) + Next.js (port 3000)
 
 | Route | Framework | Description |
 |-------|-----------|-------------|
-| `/team` | Next.js | Cinematic team page: R3F starfield, 3D orbit (12 core roles), profile overlays, searchable roster (4 members across 2 teams) |
+| `/team` | Next.js | Cinematic team page: R3F starfield, 3D orbit (12 core roles), profile overlays, searchable roster (3 members in 1 team) |
 | `/` | Vite | Three.js particle logo landing + domain parallax |
 | `/about` | Vite | Domain cards with detail panels |
 | `/events` | Vite | Three.js event coaster ride |

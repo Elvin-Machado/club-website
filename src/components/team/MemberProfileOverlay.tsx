@@ -5,9 +5,9 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, X } from 'lucide-react';
 import MemberPhoto from './MemberPhoto';
-import type { CoreMember } from './types';
+import type { ProfileSubject } from './types';
 
-function socialLinks(socials: CoreMember['socials']) {
+function socialLinks(socials: ProfileSubject['socials']) {
   if (!socials) return [];
   return Object.entries(socials).flatMap(([platform, value]) => {
     if (!value) return [];
@@ -19,8 +19,8 @@ function socialLinks(socials: CoreMember['socials']) {
   });
 }
 
-export default function MemberProfileOverlay({ member, index, total, clubName, onClose, reducedMotion, returnFocus }: {
-  member: CoreMember; index: number; total: number; clubName: string; onClose: () => void; reducedMotion: boolean; returnFocus: HTMLElement | null;
+export default function MemberProfileOverlay({ member, index, total, clubName, onClose, reducedMotion, returnFocus, group = 'THE CORE' }: {
+  member: ProfileSubject; index: number; total: number; clubName: string; onClose: () => void; reducedMotion: boolean; returnFocus: HTMLElement | null; group?: string;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function MemberProfileOverlay({ member, index, total, clubName, o
     onCancel={event => { event.preventDefault(); onClose(); }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reducedMotion ? 0.15 : 0.45 }}>
     <motion.div className="profile-surface" initial={{ scale: reducedMotion ? 1 : 1.04 }} animate={{ scale: 1 }} exit={{ scale: reducedMotion ? 1 : 0.98 }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>
       <div className="profile-portrait"><MemberPhoto key={member.image} src={member.image} name={member.name} sizes="(max-width: 767px) 100vw, 65vw" priority /><div className="profile-photo-shade" /></div>
-      <div className="profile-topline"><span className="team-kicker">{clubName.toUpperCase()} / THE CORE</span><button className="profile-close" onClick={onClose} autoFocus aria-label="Close profile">CLOSE <X size={20} /></button></div>
+      <div className="profile-topline"><span className="team-kicker">{clubName.toUpperCase()} / {group}</span><button className="profile-close" onClick={onClose} autoFocus aria-label="Close profile">CLOSE <X size={20} /></button></div>
       <div className="profile-copy"><span className="team-kicker profile-index">ORBIT {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span><p className="profile-role"><span className="team-signal" />{member.role}</p><h2 id="profile-name">{member.name}</h2>{member.bio && <p id="profile-bio" className="profile-bio">{member.bio}</p>}
         {socialLinks(member.socials).length > 0 && <nav className="profile-socials" aria-label={`${member.name}'s social links`}>{socialLinks(member.socials).map(({ platform, href }) => <a key={platform} href={href} target={platform === 'email' ? undefined : '_blank'} rel="noopener noreferrer">{platform === 'twitter' ? 'X / Twitter' : platform}<ArrowUpRight size={15} /></a>)}</nav>}
         <button className="profile-back" onClick={onClose}><ArrowLeft size={17} /> Back to the constellation</button>

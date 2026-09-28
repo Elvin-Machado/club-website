@@ -7,13 +7,13 @@ import MemberPhoto from './MemberPhoto';
 import { filterRoster, groupRoster } from './roster';
 import type { ClubMember } from './types';
 
-function MemberRow({ member, open, onToggle }: { member: ClubMember; open: boolean; onToggle: () => void }) {
+function MemberRow({ member, open, onToggle, onSelect }: { member: ClubMember; open: boolean; onToggle: () => void; onSelect: (member: ClubMember) => void }) {
   const [hovered, setHovered] = useState(false);
   const content = <><span className="roster-name">{member.name}<span className="roster-portrait" data-visible={open || hovered} aria-hidden={!open && !hovered}>{(open || hovered) && <MemberPhoto src={member.image} name={member.name} sizes="48px" />}</span></span><span className="roster-role">{member.role}</span><ArrowUpRight className="roster-row-arrow" size={16} /></>;
-  return member.image ? <button className="roster-row" onClick={onToggle} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocus={() => setHovered(true)} onBlur={() => setHovered(false)} aria-pressed={open} aria-label={`${member.name}, ${member.role}. ${open ? 'Hide' : 'Reveal'} portrait`}>{content}</button> : <div className="roster-row">{content}</div>;
+  return member.image ? <button className="roster-row" onClick={onToggle} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} onFocus={() => setHovered(true)} onBlur={() => setHovered(false)} aria-pressed={open} aria-label={`${member.name}, ${member.role}. ${open ? 'Hide' : 'Reveal'} portrait`}>{content}</button> : <button className="roster-row" onClick={() => onSelect(member)} aria-label={`View profile of ${member.name}, ${member.role}`}>{content}</button>;
 }
 
-export default function RosterSection({ members, reducedMotion }: { members: ClubMember[]; reducedMotion: boolean }) {
+export default function RosterSection({ members, reducedMotion, onSelect }: { members: ClubMember[]; reducedMotion: boolean; onSelect?: (member: ClubMember) => void }) {
   const [query, setQuery] = useState('');
   const [activeTeam, setActiveTeam] = useState('All');
   const [revealed, setRevealed] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function RosterSection({ members, reducedMotion }: { members: Clu
     </div>
     <div className="roster-groups">{groups.map(([team, people]) => <motion.section key={team} className="roster-group" aria-label={`${team} team`} initial={reducedMotion ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: reducedMotion ? 0 : 0.65, ease: [0.22, 1, 0.36, 1] }}>
       <div className="roster-group-label"><span className="roster-team-marker" /><h3>{team}</h3><span>{String(people.length).padStart(2, '0')}</span></div>
-      <div className="roster-group-members">{people.map(member => <MemberRow key={member.id} member={member} open={revealed === member.id} onToggle={() => setRevealed(revealed === member.id ? null : member.id)} />)}</div>
+      <div className="roster-group-members">{people.map(member => <MemberRow key={member.id} member={member} open={revealed === member.id} onToggle={() => setRevealed(revealed === member.id ? null : member.id)} onSelect={onSelect ?? (() => {})} />)}</div>
     </motion.section>)}</div>
     {!filtered.length && <div className="roster-empty"><Search size={26} strokeWidth={1} /><h3>No minds found this time.</h3><p>Try another name or explore a different team.</p><button onClick={() => { setQuery(''); setActiveTeam('All'); }}>Show everyone <ArrowUpRight size={15} /></button></div>}
     <div className="roster-end"><span className="team-kicker">{String(members.length).padStart(2, '0')} INDIVIDUALS. ENDLESS POSSIBILITIES.</span><span aria-hidden="true">✳</span></div>
