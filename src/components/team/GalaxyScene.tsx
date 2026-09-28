@@ -1,7 +1,7 @@
 'use client';
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { AdditiveBlending, type Group } from 'three';
 
 function Starfield({ mobile, lowPower }: { mobile: boolean; lowPower: boolean }) {
@@ -38,29 +38,16 @@ function Starfield({ mobile, lowPower }: { mobile: boolean; lowPower: boolean })
   </points></group>;
 }
 
-function ContextLifecycle({ onLost }: { onLost: () => void }) {
-  const { gl } = useThree();
-  useEffect(() => {
-    const canvas = gl.domElement;
-    canvas.addEventListener('webglcontextlost', onLost);
-    return () => canvas.removeEventListener('webglcontextlost', onLost);
-  }, [gl, onLost]);
-  return null;
-}
-
-export default memo(function GalaxyScene({ active = true, ...props }: { mobile: boolean; lowPower: boolean; active?: boolean }) {
-  const [pageVisible, setPageVisible] = useState(true);
+export default function GalaxyScene(props: { mobile: boolean; lowPower: boolean }) {
+  const [active, setActive] = useState(true);
   const [lost, setLost] = useState(false);
-  const onLost = useCallback(() => setLost(true), []);
   useEffect(() => {
-    const update = () => setPageVisible(!document.hidden);
-    update();
+    const update = () => setActive(!document.hidden);
     document.addEventListener('visibilitychange', update);
     return () => document.removeEventListener('visibilitychange', update);
   }, []);
   if (lost) return null;
-  return <Canvas dpr={[1, props.mobile || props.lowPower ? 1 : 1.5]} camera={{ position: [0, 0, 8], fov: 55 }} gl={{ alpha: true, antialias: false, powerPreference: 'low-power' }} frameloop={active && pageVisible ? 'always' : 'never'}>
-    <ContextLifecycle onLost={onLost} />
+  return <Canvas dpr={[1, props.mobile || props.lowPower ? 1 : 1.5]} camera={{ position: [0, 0, 8], fov: 55 }} gl={{ alpha: true, antialias: false, powerPreference: 'low-power' }} frameloop={active ? 'always' : 'never'} onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', () => setLost(true), { once: true }); }}>
     <Starfield {...props} />
   </Canvas>;
-});
+}

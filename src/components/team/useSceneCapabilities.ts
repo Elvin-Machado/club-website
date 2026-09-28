@@ -21,7 +21,5 @@ export function useSceneCapabilities() {
     mobileQuery.addEventListener('change', update);
     return () => mobileQuery.removeEventListener('change', update);
   }, []);
-  // Match the server's first frame before reading browser preferences. CSS
-  // already disables motion immediately for reduced-motion users.
-  return { ...capabilities, reducedMotion: capabilities.ready && Boolean(reducedMotion), canAnimate: capabilities.ready && capabilities.webgl && reducedMotion === false };
+  return { ...capabilities, reducedMotion: Boolean(reducedMotion), canAnimate: capabilities.ready && capabilities.webgl && reducedMotion === false };
 }

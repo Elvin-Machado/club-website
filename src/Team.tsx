@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { ArrowDown, ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, List, MoveDown, Sparkles, Users } from 'lucide-react';
 import type { Member } from './types';
 import { memberIntroduction, organiseTeam } from './lib/team';
-import Modal from './components/shared/Modal';
+import Modal from './components/Modal';
 import TeamOrbit from './components/TeamOrbit';
 import './team.css';
 

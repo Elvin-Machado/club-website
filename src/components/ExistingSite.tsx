@@ -4,14 +4,9 @@ import { useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Router, createPath, type Navigator } from 'react-router-dom';
 import App from '../App';
-import Admin from '../vite-pages/Admin';
+import Admin from '../Admin';
 
-/**
- * Renders the club pages (home, experiences, work, people) inside Next.js.
- *
- * The club pages are a react-router app; this bridges Next's router to it so
- * they can be served from the App Router without rewriting them.
- */
+/** Keeps the existing club pages usable during the App Router migration. */
 export default function ExistingSite({ admin }: { admin: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -21,5 +16,5 @@ export default function ExistingSite({ admin }: { admin: boolean }) {
     push: to => router.push(typeof to === 'string' ? to : createPath(to)),
     replace: to => router.replace(typeof to === 'string' ? to : createPath(to)),
   }), [router]);
-  return admin ? <Admin /> : <Router location={pathname ?? '/'} navigator={navigator}><App /></Router>;
+  return admin ? <Admin /> : <Router location={pathname} navigator={navigator}><App /></Router>;
 }
