@@ -2,7 +2,7 @@
 
 A full-stack club website for the Nucleus student innovation community at St. Joseph Engineering College, Mangaluru.
 
-**Frontend:** Next.js 16 (App Router) for the Team constellation, Vite for the legacy pages (Home, Experiences, Projects, Admin).  
+**Frontend:** Next.js 16 (App Router) for the Team showcase, Vite (SSR) for the legacy pages.  
 **Backend:** Express + SQLite for events, projects, applications, and admin.
 
 ## Project structure
@@ -10,72 +10,51 @@ A full-stack club website for the Nucleus student innovation community at St. Jo
 ```
 ├── src/
 │   ├── app/                        Next.js App Router
-│   │   ├── layout.tsx              Root layout
-│   │   ├── globals.css             Tailwind + font faces
-│   │   ├── team/page.tsx           Team constellation page (R3F starfield)
-│   │   ├── showcase/page.tsx       Speaker showcase page
-│   │   └── (existing)/             Catch-all that renders the Vite legacy pages
-│   ├── vite-pages/                 Legacy Vite pages (routed by react-router inside App)
-│   │   ├── EventExplorer.tsx         Experiences — Three.js event coaster ride
-│   │   ├── Recruitment.tsx           Join page
-│   │   ├── Admin.tsx                 Admin dashboard (lazy-loaded, auth required)
-│   │   ├── admin.css                 Admin styles
-│   │   └── event-explorer.css        Event explorer styles
+│   │   ├── layout.tsx                Root layout
+│   │   ├── globals.css               Tailwind + font faces
+│   │   ├── team/page.tsx             Team constellation page
+│   │   └── (existing)/               Catch-all for legacy Vite pages
 │   ├── components/
-│   │   ├── home/                   Home page components (from ryan)
-│   │   │   ├── LogoLanding.tsx       Three.js particle logo landing
-│   │   │   ├── DomainParallax.tsx    Domain cards with 3D tilt
-│   │   │   ├── VoicesMarquee.tsx     Scrolling community voices
-│   │   │   └── CommunityCTA.tsx      Call-to-action banner
-│   │   ├── team/                   Team constellation components (from elvin)
-│   │   │   ├── TeamShowcase.tsx      Orchestrates hero → orbit → roster
-│   │   │   ├── GalaxyScene.tsx       R3F starfield + film grain
-│   │   │   ├── CoreOrbit.tsx         3D orbit ring (12 nodes)
-│   │   │   ├── CoreCarousel.tsx      Mobile swipe carousel fallback
-│   │   │   ├── MemberProfileOverlay.tsx  Modal dialog for core profiles
-│   │   │   ├── RosterSection.tsx     Searchable grouped credits-roll
-│   │   │   └── ...                   Photo, types, data, styles
-│   │   ├── showcase/               Speaker showcase components
-│   │   ├── shared/                 Shared UI (Logo, LogoWorld, Modal)
-│   │   ├── ui/                     Reusable widgets (floating-dock, 3D card, reveal)
-│   │   ├── ProjectShowcase.tsx     Projects — horizontal deck with detail sheet
-│   │   ├── ProjectDetailSheet.tsx  Project detail bottom sheet
-│   │   ├── ExistingSite.tsx        Bridges Next.js → react-router for legacy pages
-│   │   └── ExistingSiteClient.tsx  Client-only wrapper for ExistingSite
-│   ├── lib/                        Shared logic
-│   │   ├── event-coaster.ts          Three.js coaster track + motor
-│   │   ├── event-world.ts            Walkable Three.js event world
-│   │   ├── event-navigation.ts       Station layout and pathfinding
-│   │   ├── event-scenery.ts          3D scenery and decorations
-│   │   ├── logo-scene.ts             Three.js logo animation
-│   │   ├── projects.ts               Project deck data builder
-│   │   ├── team.ts                   Team role definitions and helpers
-│   │   └── scroll-motion.ts          GSAP scroll utilities
-│   ├── assets/                     Static imports (logo PNG)
-│   ├── styles.css                  Legacy global styles (Vite app)
-│   ├── team.css                    Team Vite page styles
-│   ├── App.tsx                     React-router shell (Home, Experiences, Projects, Team)
-│   ├── Team.tsx                    Legacy team page (Vite, used by /team route)
-│   ├── main.tsx                    Vite client entry
-│   ├── entry-server.tsx            Vite SSR entry
-│   └── types.ts                    Shared TypeScript types
+│   │   ├── team/                     Team constellation components
+│   │   │   ├── GalaxyHero.tsx          R3F starfield + letterbox + film grain
+│   │   │   ├── CoreOrbit.tsx           Desktop 3D orbit ring (12 nodes)
+│   │   │   ├── CoreCarousel.tsx        Mobile swipe carousel fallback
+│   │   │   ├── MemberProfileOverlay.tsx Modal dialog for core profiles
+│   │   │   ├── RosterSection.tsx       Searchable grouped credits-roll
+│   │   │   ├── TeamShowcase.tsx        Orchestrates hero → orbit → roster
+│   │   │   ├── MemberPhoto.tsx         next/image wrapper
+│   │   │   ├── SceneBoundary.tsx       WebGL error boundary
+│   │   │   ├── useSceneCapabilities.ts Detects WebGL, mobile, reduced-motion
+│   │   │   ├── team-data.ts            Example core + roster data
+│   │   │   ├── team-showcase.css       Scoped styles
+│   │   │   ├── roster.ts              Filter + group helpers
+│   │   │   └── types.ts               CoreMember, ClubMember, TeamShowcaseProps
+│   │   ├── ExistingSite.tsx           Vite legacy site renderer
+│   │   ├── EventExplorer.tsx          Three.js event coaster
+│   │   ├── Logo.tsx                   SVG logo
+│   │   ├── Modal.tsx                  Shared modal
+│   │   └── ...
+│   ├── lib/                        Shared logic (team roles, event navigation)
+│   ├── assets/                     Static imports (logo)
+│   ├── styles.css                  Legacy global styles
+│   ├── App.tsx                     Legacy router (Vite entry)
+│   ├── main.tsx                    Legacy client entry
+│   └── entry-server.tsx            Legacy SSR entry
 ├── server/
-│   ├── app.mjs                    Express app + admin API
-│   ├── db.mjs                     SQLite (WAL, auto-seeded)
-│   ├── index.mjs                  Node API server entry
-│   ├── start.mjs                  Launches both API + Next.js
-│   └── create-admin.mjs           CLI admin creation
-├── api/index.mjs                  Vercel serverless entry
-├── shared/public-data.json        Seed data
+│   ├── app.mjs                      Express app + admin API
+│   ├── db.mjs                       SQLite (WAL, auto-seeded)
+│   ├── index.mjs                    Node server entry
+│   ├── start.mjs                    Launches both API + Next.js
+│   └── create-admin.mjs             CLI admin creation
+├── api/index.mjs                   Vercel serverless entry
+├── shared/public-data.json         Seed data
 ├── tests/
-│   ├── backend.test.mjs           22 API + auth + SSR integration tests
-│   ├── event-coaster.test.mjs     Coaster track + motor unit tests
-│   ├── event-navigation.test.mjs  Station layout + pathfinding tests
-│   ├── team-showcase.test.mjs     Roster logic unit tests
-│   ├── team.test.mjs              Team role mapping tests
-│   └── e2e/                       Playwright end-to-end tests
-├── public/                         Static assets (fonts, icons, team portraits, project covers)
-├── next.config.mjs                 Next.js config (API proxy)
+│   ├── *.test.mjs                  22 integration tests (API, auth, data)
+│   ├── team-showcase.test.mjs       Roster logic unit tests
+│   └── e2e/team.spec.mjs           21 Playwright e2e tests
+├── public/                         Static assets (fonts, icons, team portraits)
+├── scripts/                        Dev utilities
+├── next.config.mjs                 Next.js config (image patterns, API proxy)
 ├── vite.config.ts                  Vite config (legacy pages)
 ├── playwright.config.mjs           Playwright config
 ├── tsconfig.json                   TypeScript strict config
@@ -94,38 +73,34 @@ npm run dev
 ```
 
 Opens both:
-- **http://localhost:3000** — Next.js (serves all pages via App Router)
-- **http://localhost:5173** — Vite dev server (legacy pages only, optional)
-
-The primary dev experience is Next.js on port 3000. The Vite dev server is available for standalone legacy page development.
+- **http://localhost:3000** — Next.js (Team page + legacy page proxy)
+- **http://localhost:5173** — Vite dev server (legacy pages)
 
 Other dev commands:
 
 ```sh
 npm run dev:web       # Next.js only
+npm run dev:legacy    # Vite + API
 npm run dev:api       # Express API only
-npm run dev:vite      # Vite dev server only (legacy pages)
 ```
 
 ## Production build
 
 ```sh
-npm run build         # typecheck + Next.js build + Vite SSR build
+npm run build         # typecheck + Vite build + Next.js build
 npm start             # Express API (port 3001) + Next.js (port 3000)
 ```
 
 ## Pages and features
 
-| Route | Source | Description |
-|-------|--------|-------------|
-| `/` | ryan (Vite) | Three.js particle logo landing + domain parallax + community CTA + voices marquee |
-| `/about` | ryan (Vite) | Domain cards with 3D tilt and detail modals |
-| `/events` | ryan (Vite) | Three.js event coaster ride — walk through a neural-network-themed world |
-| `/projects` | elvin | Horizontal project deck with detail sheet (framer-motion + GSAP) |
-| `/team` | elvin (Next.js) | Cinematic team constellation: R3F starfield, 3D orbit (12 core roles), profile overlays, searchable roster |
-| `/recruitment` | ryan (Vite) | Join page |
-| `/admin` | elvin (Vite) | Admin dashboard (lazy-loaded, auth required) |
-| `/showcase` | elvin (Next.js) | Speaker showcase page |
+| Route | Framework | Description |
+|-------|-----------|-------------|
+| `/team` | Next.js | Cinematic team page: R3F starfield, 3D orbit (12 core roles), profile overlays, searchable roster (3 members in 1 team) |
+| `/` | Vite | Three.js particle logo landing + domain parallax |
+| `/about` | Vite | Domain cards with detail panels |
+| `/events` | Vite | Three.js event coaster ride |
+| `/projects` | Vite | Project grid with links |
+| `/admin` | Vite | Admin dashboard (lazy-loaded, auth required) |
 
 ### Team page details
 
@@ -141,8 +116,9 @@ npm start             # Express API (port 3001) + Next.js (port 3000)
 
 ```sh
 npm run typecheck       # TypeScript strict check
-npm test                # 27 integration tests (API, auth, SSR, team, events)
-npm run build           # full production build (Next.js + Vite)
+npm test                # 22 integration tests
+npx playwright test     # 21 e2e tests (hero, roster, carousel, profile, a11y)
+npm run build           # full production build
 ```
 
 ## Administrator access
