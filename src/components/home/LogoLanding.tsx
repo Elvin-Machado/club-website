@@ -1,6 +1,12 @@
+<<<<<<< HEAD:src/components/LogoLanding.tsx
 ﻿import { useEffect, useRef, useState } from 'react';
 const logoUrl = '/NucleusLogo_transparent.png';
 import { MorphingText } from './magicui/morphing-text';
+=======
+import { useEffect, useRef, useState } from 'react';
+import logoUrl from '../../../NucleusLogo_transparent.png';
+import { MorphingText } from '../magicui/morphing-text';
+>>>>>>> b06a06e2a497e685278611b3410b77e96aadc635:src/components/home/LogoLanding.tsx
 import './logo-landing.css';
 
 export default function LogoLanding() {
@@ -19,9 +25,9 @@ export default function LogoLanding() {
       disposeScene?.();
       disposeScene = undefined;
       setStatus('loading');
-      // Removed prefers-reduced-motion check as per user request
+      if (motion.matches) { setStatus('still'); return; }
       try {
-        const { createLogoScene } = await import('../lib/logo-scene');
+        const { createLogoScene } = await import('../../lib/logo-scene');
         if (disposed || current !== generation) return;
         const cleanup = await createLogoScene(element, logoUrl, () => {
           if (!disposed && current === generation) setStatus('fallback');
@@ -47,7 +53,8 @@ export default function LogoLanding() {
     };
   }, []);
 
-  return <main className="logo-landing" aria-label="Nucleus" data-status={status}>
+  return <section className="logo-landing" aria-label="Nucleus" data-status={status}>
+    <h1 className="sr-only">Nucleus SJEC — A connection worth making.</h1>
     <div className="logo-landing__scene" ref={host} role="img" aria-label="The Nucleus brain logo assembles from a field of luminous particles." />
     {/* Crop the supplied PNG's transparent padding without changing the asset. */}
     <svg className="logo-landing__fallback" viewBox="430 128 672 625" aria-hidden="true">
@@ -56,5 +63,5 @@ export default function LogoLanding() {
     <div className="logo-landing__text">
       <MorphingText texts={['THE NUCLEUS CLUB', 'CREATE', 'EXPLORE', 'INNOVATE']} />
     </div>
-  </main>;
+  </section>;
 }

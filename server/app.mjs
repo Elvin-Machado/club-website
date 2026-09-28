@@ -251,7 +251,7 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
     app.use((req, res, next) => {
       if (req.method !== 'GET' && req.method !== 'HEAD') return next();
       if (req.path.startsWith('/api') || req.path.startsWith('/assets')) return next();
-      if (!['/', '/about', '/events', '/projects', '/team'].includes(req.path.replace(/\/$/, '') || '/') && !/^\/admin(?:\/|$)/.test(req.path)) return next();
+      if (!['/', '/about', '/events', '/events-test', '/projects', '/team', '/recruitment'].includes(req.path.replace(/\/$/, '') || '/') && !/^\/admin(?:\/|$)/.test(req.path)) return next();
       let html = readFileSync(resolve(dist, 'index.html'), 'utf8');
       if (req.path.startsWith('/admin')) html = html.replace('</head>', '<meta name="robots" content="noindex,nofollow"></head>').replace('Nucleus — Where curious minds connect | SJEC', 'Control room | Nucleus');
       else if (render) {

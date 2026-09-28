@@ -3,6 +3,10 @@ const logoUrl = '/NucleusLogo_transparent.png';
 =======
 <<<<<<< HEAD
 import { useEffect, useState } from 'react';
+<<<<<<< HEAD:src/components/Logo.tsx
+=======
+import logoUrl from '../../../NucleusLogo_transparent.png';
+>>>>>>> b06a06e2a497e685278611b3410b77e96aadc635:src/components/shared/Logo.tsx
 
 export function Logo({ className = '' }: { className?: string }) {
   return <img className={`brand-mark ${className}`} src="/brain-mark.svg" alt="" width="56" height="56" />;

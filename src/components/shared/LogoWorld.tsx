@@ -1,6 +1,6 @@
 import { useEffect, useRef, type RefObject } from 'react';
-import { type Station, type MoveInput, type WorldMode, type WorldSnapshot } from '../lib/event-navigation';
-import { createEventWorld } from '../lib/event-world';
+import { type Station, type MoveInput, type WorldMode, type WorldSnapshot } from '../../lib/event-navigation';
+import { createEventWorld } from '../../lib/event-world';
 
 export interface LogoWorldProps {
   stations: Station[];
@@ -8,10 +8,10 @@ export interface LogoWorldProps {
   paused: boolean;
   reduced: boolean;
   input: RefObject<MoveInput>;
-  command: { serial: number; station: number | null };
+  command: { serial: number; station: number | null; resume?: boolean };
   onReady: () => void;
   onError: () => void;
-  onSnapshot: (snapshot: WorldSnapshot) => void;
+  onSnapshot?: (snapshot: WorldSnapshot) => void;
   onArrive: (index: number) => void;
   onSelect: (index: number) => void;
 }
@@ -26,7 +26,7 @@ export default function LogoWorld(props: LogoWorldProps) {
     catch (error) { console.error('Unable to create the Nucleus world:', error); live.current.onError(); }
   }, []);
   return <div ref={host} className="nx-world" tabIndex={0} role="group"
-    aria-label="Interactive Nucleus logo. W A S D to move, left and right arrows to turn, drag to look. E opens a nearby station."
+    aria-label="Nucleus roller coaster. W or D to accelerate, S or A to brake and reverse. Drag to look. E opens a nearby station."
     aria-describedby="nx-control-summary">
     <div className="nx-world-markers" aria-label="Stations on the map" hidden={props.mode !== 'overview' || props.paused}>
       {props.stations.map(station => <button key={station.id} data-world-station={station.id}
