@@ -1,12 +1,6 @@
-<<<<<<< HEAD:src/components/LogoLanding.tsx
-﻿import { useEffect, useRef, useState } from 'react';
-const logoUrl = '/NucleusLogo_transparent.png';
-import { MorphingText } from './magicui/morphing-text';
-=======
 import { useEffect, useRef, useState } from 'react';
-import logoUrl from '../../../NucleusLogo_transparent.png';
+import { LOGO_URL } from '../../lib/logo-url';
 import { MorphingText } from '../magicui/morphing-text';
->>>>>>> b06a06e2a497e685278611b3410b77e96aadc635:src/components/home/LogoLanding.tsx
 import './logo-landing.css';
 
 export default function LogoLanding() {
@@ -29,7 +23,7 @@ export default function LogoLanding() {
       try {
         const { createLogoScene } = await import('../../lib/logo-scene');
         if (disposed || current !== generation) return;
-        const cleanup = await createLogoScene(element, logoUrl, () => {
+        const cleanup = await createLogoScene(element, LOGO_URL, () => {
           if (!disposed && current === generation) setStatus('fallback');
         });
         if (disposed || current !== generation) cleanup();
@@ -58,7 +52,7 @@ export default function LogoLanding() {
     <div className="logo-landing__scene" ref={host} role="img" aria-label="The Nucleus brain logo assembles from a field of luminous particles." />
     {/* Crop the supplied PNG's transparent padding without changing the asset. */}
     <svg className="logo-landing__fallback" viewBox="430 128 672 625" aria-hidden="true">
-      <image href={logoUrl} width="1599" height="899" />
+      <image href={LOGO_URL} width="1599" height="899" />
     </svg>
     <div className="logo-landing__text">
       <MorphingText texts={['THE NUCLEUS CLUB', 'CREATE', 'EXPLORE', 'INNOVATE']} />

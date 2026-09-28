@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
-import ExistingSite from '../../../components/ExistingSite';
+import ExistingSiteClient from '../../../components/ExistingSiteClient';
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ path?: string[] }> }) {
   const { path = [] } = await params;
@@ -9,6 +11,6 @@ export async function generateMetadata({ params }: { params: Promise<{ path?: st
 export default async function ExistingPage({ params }: { params: Promise<{ path?: string[] }> }) {
   const { path = [] } = await params;
   const pathname = `/${path.join('/')}`;
-  if (!['/', '/about', '/events', '/projects', '/admin'].includes(pathname)) notFound();
-  return <ExistingSite admin={pathname === '/admin'} />;
+  if (!['/', '/about', '/events', '/projects', '/admin', '/recruitment'].includes(pathname)) notFound();
+  return <ExistingSiteClient admin={pathname === '/admin'} />;
 }

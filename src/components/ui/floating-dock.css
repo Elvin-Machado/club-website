@@ -1,6 +1,6 @@
-﻿.site-navigation { margin-inline: auto; }
-.fd-desktop { display: flex; align-items: center; gap: 10px; height: 84px; }
-.fd-link { width: 76px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; padding-bottom: 5px; position: relative; }
+.site-navigation { margin-inline: auto; }
+.fd-desktop { display: flex; align-items: center; gap: 7px; height: 84px; }
+.fd-link { width: 70px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; padding-bottom: 5px; position: relative; }
 .fd-item { display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 50%; transition: border-color .2s, background .2s; }
 .fd-link:hover .fd-item, .fd-link.active .fd-item { background: var(--wash); border-color: var(--line-strong); }
 .fd-icon-container { display: flex; align-items: center; justify-content: center; }

@@ -1,31 +1,37 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+# Dependencies
 node_modules/
-dist/
-data/
-.env
-.env.*.local
-*.tsbuildinfo
-*.log
-playwright-report/
-test-results/
-.vercel
-=======
->>>>>>> e6a133606ce9d4b7d43c220df69bac3528f841ae
-node_modules/
+
+# Build output
 dist/
 .next/
-.vercel/
+out/
+
+# Local database (SQLite is created and seeded on first run)
 data/
-.env*
+
+# Local environment
+.env
+.env.*.local
+
+# TypeScript incremental build cache
 *.tsbuildinfo
+
+# Logs
 *.log
+npm-debug.log*
+
+# Test output
 test-results/
-<<<<<<< HEAD
 playwright-report/
-=======
-.vercel
-.env*
->>>>>>> 24551fe568b8ad3d66a35507c45e3569b24f2d26
->>>>>>> e6a133606ce9d4b7d43c220df69bac3528f841ae
+blob-report/
+playwright/.cache/
+
+# Deployment
+.vercel/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
