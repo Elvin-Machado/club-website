@@ -85,6 +85,18 @@ test('content CRUD validates dates, persists publication status, and updates the
   assert.equal((await request('/site').then(r => r.json())).events.length, 3);
 }));
 test('database content survives a close and reopen without reseeding over edits', () => {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  const directory = mkdtempSync(join(tmpdir(), 'nucleus-db-test-')), path = join(directory, 'site.sqlite');
+  let db;
+  try {
+    db = openDatabase(path); const settings = getSite(db).settings; settings.cycle = 'persisted-intake';
+    db.prepare('UPDATE settings SET body=?').run(JSON.stringify(settings)); db.close(); db = openDatabase(path);
+    assert.equal(getSite(db).settings.cycle, 'persisted-intake'); assert.equal(getSite(db).events.length, 3);
+  } finally { db?.close(); rmSync(directory, { recursive: true, force: true }); }
+=======
+>>>>>>> e6a133606ce9d4b7d43c220df69bac3528f841ae
   const directory = mkdtempSync(join(tmpdir(), 'nucleus-db-test-')), path = join(directory, 'site.sqlite');
   let db;
   try {
@@ -114,6 +126,10 @@ test('production server-renders the landing and club routes, escapes data, and h
     const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^" ]+)"/g)].map(m => m[1]); assert.ok(assets.length > 0);
     for (const asset of assets) { const assetRes = await fetch(base + asset); assert.equal(assetRes.status, 200); assert.match(assetRes.headers.get('cache-control'), /immutable/); }
   }, { dist: resolve('dist/client'), render });
+<<<<<<< HEAD
+=======
+>>>>>>> 24551fe568b8ad3d66a35507c45e3569b24f2d26
+>>>>>>> e6a133606ce9d4b7d43c220df69bac3528f841ae
 });
 
 test('production sessions use secure host-only cookies and authentication is rate limited', async () => {

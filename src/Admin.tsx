@@ -1,3 +1,85 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import { useEffect, useState, type FormEvent } from 'react';
+import { ArrowLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Edit3, LoaderCircle, LogOut, Plus, Save, Trash2, Users } from 'lucide-react';
+import { Logo } from './components/Logo';
+import Modal from './components/Modal';
+import { api } from './api';
+import type { Application, SiteData } from './types';
+import './admin.css';
+
+type Session = { email: string; csrf: string };
+type Tab = 'applications' | 'events' | 'projects' | 'team' | 'settings';
+type Content = { id: string; [key: string]: unknown };
+const datetime = (value: unknown) => { if (!value) return ''; const d = new Date(String(value)); return new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 16); };
+const definitions: Record<string, { key: string; label: string; type?: string; optional?: boolean }[]> = {
+  events: [{ key: 'title', label: 'Event title' }, { key: 'category', label: 'Category' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'startsAt', label: 'Starts (your local timezone)', type: 'datetime-local' }, { key: 'endsAt', label: 'Ends (your local timezone)', type: 'datetime-local', optional: true }, { key: 'location', label: 'Venue / location' }, { key: 'registrationUrl', label: 'Registration URL', type: 'url', optional: true }],
+  projects: [{ key: 'title', label: 'Project title' }, { key: 'description', label: 'Description', type: 'textarea' }, { key: 'domain', label: 'Domain' }, { key: 'status', label: 'Status' }, { key: 'url', label: 'Project URL', type: 'url', optional: true }, { key: 'repositoryUrl', label: 'Repository URL', type: 'url', optional: true }],
+  team: [{ key: 'name', label: 'Full name' }, { key: 'role', label: 'Role' }, { key: 'initials', label: 'Initials' }, { key: 'bio', label: 'Introduction', type: 'textarea', optional: true }],
+  settings: [{ key: 'recruitmentMessage', label: 'Recruitment announcement', type: 'textarea' }, { key: 'cycle', label: 'Intake identifier (e.g. 2026-autumn)' }, { key: 'recruitmentDeadline', label: 'Application deadline (optional, your local timezone)', type: 'datetime-local', optional: true }, { key: 'contactEmail', label: 'Contact email', type: 'email' }, { key: 'instagramUrl', label: 'Instagram URL', type: 'url', optional: true }, { key: 'githubUrl', label: 'GitHub URL', type: 'url', optional: true }, { key: 'linkedinUrl', label: 'LinkedIn URL', type: 'url', optional: true }],
+};
+
+function Editor({ kind, item, session, onSaved, onClose }: { kind: Exclude<Tab, 'applications'>; item: Content; session: Session; onSaved: () => void; onClose: () => void }) {
+  const [busy, setBusy] = useState(false), [error, setError] = useState('');
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); setBusy(true); setError('');
+    const raw = new FormData(e.currentTarget), body: Record<string, unknown> = {};
+    for (const field of definitions[kind]) { const value = String(raw.get(field.key) || '').trim(); body[field.key] = field.type === 'datetime-local' && value ? new Date(value).toISOString() : value; }
+    if (kind === 'settings') body.recruitmentOpen = raw.has('recruitmentOpen');
+    else if (kind !== 'team') body.published = raw.has('published');
+    try { await api(kind === 'settings' ? '/admin/settings' : `/admin/content/${kind}/${item.id}`, { method: 'PUT', headers: { 'X-CSRF-Token': session.csrf }, body: JSON.stringify(body) }); onSaved(); }
+    catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+  return <Modal title={kind === 'settings' ? 'Club settings' : `${item.title || item.name ? 'Edit' : 'Add'} ${kind === 'team' ? 'team member' : kind.slice(0, -1)}`} onClose={onClose}><form className="admin-form" onSubmit={submit}>
+    {kind === 'settings' && <><label className="checkbox-label"><input type="checkbox" name="recruitmentOpen" defaultChecked={!!item.recruitmentOpen} /><span>Accept applications</span></label><p className="editor-note">This setting controls the entire website. A passed deadline automatically closes applications. Changing the intake identifier allows the same student to apply in a new cycle.</p></>}
+    {definitions[kind].map(field => <label key={field.key}>{field.label}{field.optional && <span className="muted"> · optional</span>}{field.type === 'textarea' ? <textarea name={field.key} rows={4} maxLength={1600} minLength={field.optional ? undefined : kind === 'settings' ? 10 : 20} required={!field.optional} defaultValue={String(item[field.key] || '')} /> : <input type={field.type || 'text'} name={field.key} required={!field.optional} maxLength={field.type === 'url' ? 500 : field.key === 'initials' ? 4 : 254} defaultValue={field.type === 'datetime-local' ? datetime(item[field.key]) : String(item[field.key] || '')} />}</label>)}
+    {kind !== 'settings' && kind !== 'team' && <label className="checkbox-label"><input type="checkbox" name="published" defaultChecked={item.published !== false} /><span>Published on the public website</span></label>}
+    {error && <p className="form-error" role="alert">{error}</p>}<button className="button primary full-width" disabled={busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <Save size={17} />}{busy ? 'Saving…' : 'Save changes'}</button>
+  </form></Modal>;
+}
+
+export default function Admin() {
+  const [session, setSession] = useState<Session | null>(null), [checking, setChecking] = useState(true), [error, setError] = useState(''), [busy, setBusy] = useState(false), [notice, setNotice] = useState('');
+  const [site, setSite] = useState<SiteData | null>(null), [tab, setTab] = useState<Tab>('applications'), [applications, setApplications] = useState<Application[]>([]), [total, setTotal] = useState(0), [offset, setOffset] = useState(0), [loading, setLoading] = useState(false);
+  const [editor, setEditor] = useState<{ kind: Exclude<Tab, 'applications'>; item: Content } | null>(null), [details, setDetails] = useState<Application | null>(null), [deleting, setDeleting] = useState<{ kind: string; id: string; title: string } | null>(null);
+  useEffect(() => { document.title = 'Control room | Nucleus'; api<Session>('/admin/session').then(setSession).catch(() => {}).finally(() => setChecking(false)); }, []);
+  async function refresh() {
+    setLoading(true); setError('');
+    try { const [data, inbox] = await Promise.all([api<SiteData>('/admin/site'), api<{ items: Application[]; total: number }>(`/admin/applications?offset=${offset}`)]); setSite(data); setApplications(inbox.items); setTotal(inbox.total); }
+    catch (e) { setError((e as Error).message); } finally { setLoading(false); }
+  }
+  useEffect(() => { if (session) void refresh(); }, [session, offset]);
+  async function login(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setBusy(true); setError('');
+    try { setSession(await api<Session>('/admin/login', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))) })); }
+    catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+  async function logout() { setBusy(true); try { await api('/admin/logout', { method: 'POST', headers: { 'X-CSRF-Token': session!.csrf } }); setSession(null); setSite(null); setApplications([]); setError(''); } catch (e) { setError((e as Error).message); } finally { setBusy(false); } }
+  async function status(item: Application, value: string) {
+    setBusy(true); setError(''); try { await api(`/admin/applications/${item.id}`, { method: 'PATCH', headers: { 'X-CSRF-Token': session!.csrf }, body: JSON.stringify({ status: value }) }); setApplications(items => items.map(a => a.id === item.id ? { ...a, status: value } : a)); setDetails({ ...item, status: value }); setNotice('Application status saved.'); } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+  async function remove() {
+    if (!deleting || !session) return; setBusy(true); setError('');
+    try { await api(deleting.kind === 'applications' ? `/admin/applications/${deleting.id}` : `/admin/content/${deleting.kind}/${deleting.id}`, { method: 'DELETE', headers: { 'X-CSRF-Token': session.csrf } }); setDeleting(null); setDetails(null); setNotice('Record deleted.'); await refresh(); }
+    catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+  if (checking) return <div className="page-loading"><LoaderCircle className="spin" size={18} />&nbsp;Opening the control room…</div>;
+  if (!session) return <main className="admin-login"><a href="/" className="text-link"><ArrowLeft size={16} />Back to Nucleus</a><div className="login-card"><Logo /><span className="eyebrow">FOR THE PEOPLE BEHIND THE SPARK</span><h1>The control room.</h1><p>Sign in to manage your community.</p><form onSubmit={login} className="admin-form"><label>Email<input type="email" name="email" autoComplete="username" required maxLength={254} /></label><label>Password<input type="password" name="password" autoComplete="current-password" required maxLength={256} /></label>{error && <p className="form-error" role="alert">{error}</p>}<button className="button primary full-width" disabled={busy}>{busy ? <LoaderCircle className="spin" size={17} /> : <ArrowUpRight size={17} />}{busy ? 'Signing in…' : 'Sign in'}</button></form><p className="login-note">Administrator accounts are created by the site operator. Contact your club’s technical lead for access.</p></div></main>;
+  return <div className="admin-shell"><header className="admin-header"><a href="/" className="brand"><Logo /><span>NUCLEUS<small>THE CONTROL ROOM</small></span></a><div><span>{session.email}</span><a className="text-link" href="/" target="_blank" rel="noreferrer">View website <ArrowUpRight size={16} /></a><button className="icon-button" aria-label="Sign out" onClick={logout} disabled={busy}><LogOut size={17} /></button></div></header><main className="admin-main"><div className="admin-heading"><div><span className="eyebrow">YOUR COMMUNITY, CONNECTED</span><h1>Make things happen.</h1></div><span className={`recruitment-badge ${site?.settings.recruitmentOpen ? 'is-open' : ''}`}><i />Recruitment {site?.settings.recruitmentOpen ? 'open' : 'closed'}</span></div>
+    <div className="admin-tabs" role="tablist" aria-label="Control room sections">{(['applications', 'events', 'projects', 'team', 'settings'] as Tab[]).map(item => <button key={item} role="tab" aria-selected={tab === item} aria-controls="admin-panel" onClick={() => { setTab(item); setNotice(''); }}>{item}{item === 'applications' && <span>{total}</span>}</button>)}</div>
+    {error && <p className="form-error" role="alert">{error} <button className="text-link" onClick={refresh}>Retry</button></p>}{notice && <p className="admin-notice" role="status"><Check size={15} />{notice}</p>}
+    <section id="admin-panel" role="tabpanel" aria-label={tab} className="admin-panel">{loading && !site ? <div className="empty-state">Loading club data…</div> : tab === 'applications' ? <><div className="admin-panel-heading"><div><h2>Recruitment inbox</h2><p>{total} application{total === 1 ? '' : 's'} across all intakes. Status changes are internal and do not send email.</p></div><button className="button outline" onClick={refresh} disabled={loading}>Refresh</button></div>{!applications.length ? <div className="admin-empty"><Users size={32} /><h3>A new connection is on its way.</h3><p>Applications will appear here when recruitment is open.</p></div> : <div className="inbox-table-wrap"><table className="inbox-table"><thead><tr><th>Applicant</th><th>Domain / year</th><th>Intake</th><th>Received</th><th>Status</th><th>Review</th></tr></thead><tbody>{applications.map(item => <tr key={item.id}><td><strong>{item.name}</strong><span>{item.email}</span></td><td>{({ aiml: 'AI & ML', web: 'Web development', dsa: 'DSA' })[item.domain]}<span>Year {item.year}</span></td><td>{item.cycle}</td><td>{new Date(item.createdAt).toLocaleDateString()}</td><td><span className={`application-status status-${item.status}`}>{item.status}</span></td><td><button className="icon-button" aria-label={`Review ${item.name}`} onClick={() => setDetails(item)}><ArrowUpRight size={16} /></button></td></tr>)}</tbody></table></div>}<div className="inbox-pagination"><span>{total ? `${offset + 1}–${Math.min(offset + 100, total)} of ${total}` : 'No applications yet'}</span><button className="icon-button" aria-label="Previous page" disabled={offset === 0 || loading} onClick={() => setOffset(Math.max(0, offset - 100))}><ChevronLeft size={17} /></button><button className="icon-button" aria-label="Next page" disabled={offset + 100 >= total || loading} onClick={() => setOffset(offset + 100)}><ChevronRight size={17} /></button></div></>
+      : tab === 'settings' ? <><div className="admin-panel-heading"><div><h2>One source of truth.</h2><p>Update recruitment and contact information across the website.</p></div><button className="button primary" disabled={!site} onClick={() => setEditor({ kind: 'settings', item: { id: 'settings', ...site!.settings } })}><Edit3 size={15} />Edit settings</button></div>{site && <dl className="settings-summary"><div><dt>Recruitment</dt><dd>{site.settings.recruitmentOpen ? 'Accepting applications' : 'Closed'}</dd></div><div><dt>Announcement</dt><dd>{site.settings.recruitmentMessage}</dd></div><div><dt>Intake</dt><dd>{site.settings.cycle}</dd></div><div><dt>Deadline</dt><dd>{site.settings.recruitmentDeadline ? new Date(site.settings.recruitmentDeadline).toLocaleString() : 'No deadline set'}</dd></div><div><dt>Contact</dt><dd>{site.settings.contactEmail}</dd></div></dl>}</>
+      : <><div className="admin-panel-heading"><div><h2>{tab === 'team' ? 'The people behind Nucleus' : tab === 'events' ? 'Experiences worth sharing' : 'Ideas in the real world'}</h2><p>{tab === 'events' ? 'Published events appear in the 3D ride and the accessible list.' : tab === 'team' ? 'Keep the community’s leadership and roles up to date.' : 'Tell the story of what your community is building.'}</p></div><button className="button primary" onClick={() => setEditor({ kind: tab, item: { id: crypto.randomUUID(), published: true } })}><Plus size={15} />Add {tab === 'team' ? 'member' : tab.slice(0, -1)}</button></div><div className="admin-content-grid">{site?.[tab].map(raw => { const item = raw as unknown as Content; return <article key={item.id} className="admin-content-card"><span className="eyebrow">{tab === 'team' ? String(item.role) : item.published ? 'Published' : 'Draft'}</span><h3>{String(item.title || item.name)}</h3>{item.description ? <p>{String(item.description)}</p> : null}{item.startsAt ? <span className="small muted">{new Date(String(item.startsAt)).toLocaleString()}</span> : null}<div><button className="button outline" onClick={() => setEditor({ kind: tab, item })}><Edit3 size={14} />Edit</button><button className="icon-button danger" aria-label={`Delete ${item.title || item.name}`} onClick={() => setDeleting({ kind: tab, id: item.id, title: String(item.title || item.name) })}><Trash2 size={15} /></button></div></article>; })}</div></>}
+    </section><p className="admin-footer-note">Nucleus SJEC · Changes are saved to the club database.</p></main>
+    {editor && <Editor kind={editor.kind} item={editor.item} session={session} onClose={() => setEditor(null)} onSaved={() => { setEditor(null); setNotice('Changes saved. The public website will show them on its next visit.'); void refresh(); }} />}
+    {details && !deleting && <Modal title={details.name} onClose={() => setDetails(null)}><div className="application-detail"><a className="text-link" href={`mailto:${details.email}`}>{details.email}<ArrowUpRight size={14} /></a><p className="muted small">Year {details.year} · {details.domain.toUpperCase()} · {details.cycle} intake</p><h3>What they want to learn or build</h3><p className="application-motivation">{details.motivation}</p>{details.portfolio && <a className="text-link" href={details.portfolio} target="_blank" rel="noreferrer">Portfolio / GitHub <ArrowUpRight size={15} /></a>}<label>Review status<select value={details.status} disabled={busy} onChange={e => status(details, e.target.value)}>{['new', 'reviewing', 'accepted', 'declined'].map(value => <option key={value} value={value}>{value}</option>)}</select></label>{error && <p className="form-error" role="alert">{error}</p>}<p className="small muted">Received {new Date(details.createdAt).toLocaleString()}<br />Reference: {details.id}</p><button className="button outline danger" onClick={() => setDeleting({ kind: 'applications', id: details.id, title: `${details.name}’s application` })}><Trash2 size={15} />Delete personal data</button></div></Modal>}
+    {deleting && <Modal title="Delete this record?" onClose={() => setDeleting(null)}><p className="modal-lead">“{deleting.title}” will be permanently removed from the database. This cannot be undone.</p>{error && <p className="form-error" role="alert">{error}</p>}<div className="delete-actions"><button className="button outline" onClick={() => setDeleting(null)}>Keep record</button><button className="button danger-solid" disabled={busy} onClick={remove}>{busy ? 'Deleting…' : 'Delete permanently'}</button></div></Modal>}
+  </div>;
+}
+=======
+>>>>>>> e6a133606ce9d4b7d43c220df69bac3528f841ae
 import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowLeft, ArrowUpRight, Check, ChevronLeft, ChevronRight, Edit3, LoaderCircle, LogOut, Plus, Save, Trash2, Users } from 'lucide-react';
 import { Logo } from './components/Logo';
@@ -82,3 +164,7 @@ export default function Admin() {
     {deleting && <Modal title="Delete this record?" onClose={() => setDeleting(null)}><p className="modal-lead">“{deleting.title}” will be permanently removed from the database. This cannot be undone.</p>{error && <p className="form-error" role="alert">{error}</p>}<div className="delete-actions"><button className="button outline" onClick={() => setDeleting(null)}>Keep record</button><button className="button danger-solid" disabled={busy} onClick={remove}>{busy ? 'Deleting…' : 'Delete permanently'}</button></div></Modal>}
   </div>;
 }
+<<<<<<< HEAD
+=======
+>>>>>>> 24551fe568b8ad3d66a35507c45e3569b24f2d26
+>>>>>>> e6a133606ce9d4b7d43c220df69bac3528f841ae
