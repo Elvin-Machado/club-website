@@ -11,6 +11,8 @@ export interface LogoWorldProps {
   command: { serial: number; station: number | null; resume?: boolean };
   onReady: () => void;
   onError: () => void;
+  // Event pages that do not render position telemetry may omit onSnapshot; the
+  // world loop always reports positions, so a no-op is supplied internally.
   onSnapshot?: (snapshot: WorldSnapshot) => void;
   onArrive: (index: number) => void;
   onSelect: (index: number) => void;
@@ -18,8 +20,11 @@ export interface LogoWorldProps {
 
 export default function LogoWorld(props: LogoWorldProps) {
   const host = useRef<HTMLDivElement>(null);
-  const live = useRef(props);
-  live.current = props;
+  const live = useRef<LogoWorldProps & { onSnapshot: (snapshot: WorldSnapshot) => void }>({
+    ...props,
+    onSnapshot: props.onSnapshot ?? (() => {}),
+  });
+  live.current = { ...props, onSnapshot: props.onSnapshot ?? (() => {}) };
   useEffect(() => {
     if (!host.current) return;
     try { return createEventWorld(host.current, () => live.current); }

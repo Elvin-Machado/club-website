@@ -6,7 +6,7 @@ import { AdditiveBlending, type Group } from 'three';
 
 function Starfield({ mobile, lowPower }: { mobile: boolean; lowPower: boolean }) {
   const group = useRef<Group>(null);
-  const count = lowPower ? 450 : mobile ? 750 : 3200;
+  const count = lowPower ? 300 : mobile ? 450 : 1800;
   const positions = useMemo(() => {
     let seed = 8392;
     const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -38,7 +38,7 @@ function Starfield({ mobile, lowPower }: { mobile: boolean; lowPower: boolean })
   </points></group>;
 }
 
-export default function GalaxyScene(props: { mobile: boolean; lowPower: boolean }) {
+export default function GalaxyScene(props: { mobile: boolean; lowPower: boolean; onReady?: (ready: boolean) => void }) {
   const [active, setActive] = useState(true);
   const [lost, setLost] = useState(false);
   useEffect(() => {
@@ -47,7 +47,10 @@ export default function GalaxyScene(props: { mobile: boolean; lowPower: boolean 
     return () => document.removeEventListener('visibilitychange', update);
   }, []);
   if (lost) return null;
-  return <Canvas dpr={[1, props.mobile || props.lowPower ? 1 : 1.5]} camera={{ position: [0, 0, 8], fov: 55 }} gl={{ alpha: true, antialias: false, powerPreference: 'low-power' }} frameloop={active ? 'always' : 'never'} onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', () => setLost(true), { once: true }); }}>
+  return <Canvas dpr={[1, props.mobile || props.lowPower ? 1 : 1.5]} camera={{ position: [0, 0, 8], fov: 55 }} gl={{ alpha: true, antialias: false, powerPreference: 'low-power' }} frameloop={active ? 'always' : 'never'} onCreated={({ gl }) => {
+    props.onReady?.(true);
+    gl.domElement.addEventListener('webglcontextlost', () => { setLost(true); props.onReady?.(false); }, { once: true });
+  }}>
     <Starfield {...props} />
   </Canvas>;
 }

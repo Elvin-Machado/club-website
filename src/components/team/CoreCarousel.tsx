@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ArrowUpRight } from 'lucide-react';
+import MemberPhoto from './MemberPhoto';
 import type { CoreMember } from './types';
 
 export default function CoreCarousel({ core, onSelect, reducedMotion }: { core: CoreMember[]; onSelect: (member: CoreMember) => void; reducedMotion: boolean }) {
@@ -20,7 +21,9 @@ export default function CoreCarousel({ core, onSelect, reducedMotion }: { core: 
     }}>{core.map((member, index) => <article className="core-carousel-slide" key={member.id} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${core.length}`}>
       <button onClick={() => onSelect(member)} className="core-carousel-button" aria-label={`Meet ${member.name}, ${member.role}`} aria-haspopup="dialog">
         <span className="team-kicker carousel-coordinate">CORE / {String(index + 1).padStart(2, '0')}</span>
-        <span className="carousel-planet" aria-hidden="true"><i /><b>{member.name.split(' ').map(part => part[0]).slice(0, 2).join('')}</b></span>
+        <div className="carousel-portrait-frame" aria-hidden="true">
+          <MemberPhoto src={member.image} name={member.name} sizes="140px" />
+        </div>
         <span className="carousel-member-name">{member.name}</span><span className="carousel-member-role">{member.role}</span>
         <span className="carousel-discover">Meet this mind <ArrowUpRight size={16} /></span>
       </button>

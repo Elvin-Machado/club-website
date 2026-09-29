@@ -107,7 +107,16 @@ test('production server-renders the landing and club routes, escapes data, and h
     assert.doesNotMatch(html, /Enable JavaScript to explore events and apply/);
     assert.match(html, /Updated from the database/); assert.match(html, /application\/ld\+json/);
     const about = await fetch(`${base}/about`).then(r => r.text());
-    assert.match(about, /class="dp-section"/); assert.match(about, /Data Structures/); assert.match(about, /site-header/);
+    assert.match(about, /class="domain-grid"/); assert.match(about, /Data Structures/); assert.match(about, /site-header/);
+    for (const [route, heading] of [['/team', 'NUCLEUS'], ['/members', 'Our Members'], ['/alumni', 'NUCLEUS Alumni']]) {
+      const peopleResponse = await fetch(`${base}${route}`);
+      assert.equal(peopleResponse.status, 200);
+      const peopleHtml = await peopleResponse.text();
+      assert.ok(peopleHtml.includes(heading));
+      assert.match(peopleHtml, /team-header/);
+      if (route !== '/team') assert.doesNotMatch(peopleHtml, /class="constellation-section"/);
+      if (route === '/members') assert.match(peopleHtml, /Salim Pallikal/);
+    }
     assert.ok(!html.includes('</script><script>alert(1)</script>')); assert.match(html, /id="nucleus-data"/);
     const admin = await fetch(`${base}/admin`).then(r => r.text()); assert.match(admin, /noindex,nofollow/); assert.ok(!admin.includes('Updated from the database'));
     assert.equal((await fetch(`${base}/does-not-exist`)).status, 404);

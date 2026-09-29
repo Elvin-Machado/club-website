@@ -9,9 +9,11 @@ import type { ProfileSubject } from './types';
 export default function MemberCard({ member, index, onSelect, reducedMotion }: {
   member: ProfileSubject; index: number; onSelect: () => void; reducedMotion: boolean;
 }) {
-  const domain = member.domain || member.department || ('team' in member ? member.team : undefined);
+  const domain = 'domain' in member && member.domain
+    ? member.domain
+    : 'department' in member && member.department ? member.department : 'team' in member ? member.team : undefined;
   const career = 'jobTitle' in member || 'organization' in member
-    ? [member.jobTitle, member.organization].filter(Boolean).join(' · ') : undefined;
+    ? ['jobTitle' in member ? member.jobTitle : '', 'organization' in member ? member.organization : ''].filter(Boolean).join(' · ') : undefined;
 
   return <motion.button type="button" className="gallery-card" data-member-id={member.id}
     initial={reducedMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}

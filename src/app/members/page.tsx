@@ -1,0 +1,14 @@
+import type { Metadata } from 'next';
+import MembersShowcase from '../../components/team/MembersShowcase';
+import { exampleCore, exampleMembers } from '../../components/team/team-data';
+import { alumniMembers, currentTeam } from '../../components/team/alumni-data';
+
+export const metadata: Metadata = {
+  title: 'Members',
+  description: 'Meet the current NUCLEUS community of curious minds, builders, and collaborators at SJEC.',
+};
+
+export default function MembersPage() {
+  const { members } = currentTeam(exampleCore, exampleMembers, alumniMembers);
+  return <MembersShowcase clubName="Nucleus" members={members} />;
+}

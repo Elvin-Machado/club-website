@@ -9,7 +9,7 @@ import seed from '../shared/public-data.json';
 import LogoLanding from './components/LogoLanding';
 import EventExplorer from './components/EventExplorer';
 import DomainParallax from './components/DomainParallax';
-import TeamPage from './Team';
+import LegacyPeople from './components/team/LegacyPeople';
 import ProjectShowcase from './components/ProjectShowcase';
 
 const domains = [
@@ -111,6 +111,8 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
     );
   }
 
+  if (/^\/(?:team|members|alumni)\/?$/.test(location.pathname)) return <LegacyPeople team={data.team} />;
+
   return <>
     <a href="#main-content" className="skip-link">Skip to content</a>
     <header className={`site-header${location.pathname === '/projects' ? ' projects-header' : ''}`}><Link className="brand" to="/" aria-label="Nucleus home"><Logo /><span>NUCLEUS<small>SJEC · MANGALURU</small></span></Link>
@@ -134,12 +136,9 @@ export default function App({ initialData = seed }: { initialData?: SiteData }) 
 
         <Route path="/projects" element={<ProjectShowcase projects={data.projects} settings={settings} />} />
 
-        <Route path="/team" element={
-          <TeamPage team={data.team} onJoin={() => setApplyOpen(true)} />
-        } />
       </Routes>
     </main>
-    {location.pathname !== '/about' && location.pathname !== '/events' && <SiteFooter settings={settings} />}
+    {location.pathname !== '/about' && location.pathname !== '/events' && location.pathname !== '/team' && location.pathname !== '/members' && location.pathname !== '/alumni' && <SiteFooter settings={settings} />}
     {applyOpen && <ApplyForm settings={settings} online={online} onClose={() => setApplyOpen(false)} />}
     {domain !== null && <Modal title={`${domains[domain].title} ${domains[domain].subtitle}`} onClose={() => setDomain(null)}><p className="modal-lead">{domains[domain].detail}</p><div className="domain-tags">{domains[domain].tags.map(tag => <span key={tag}>{tag}</span>)}</div><button className="button primary" onClick={() => { setDomain(null); setApplyOpen(true); }}>Find your next connection <ArrowUpRight size={17} /></button></Modal>}
   </>;

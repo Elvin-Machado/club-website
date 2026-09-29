@@ -1,13 +1,18 @@
 import logoUrlRaw from '../assets/NucleusLogo_transparent.png';
 
 /**
- * Next.js wraps static asset imports in `{ default: url }` while Vite returns
- * the plain URL string.  This helper normalises the value so the rest of the
- * codebase can use it as a plain string.
+ * Next.js/Turbopack resolves static asset imports differently per context:
+ * - a plain URL string (client bundles)
+ * - a `{ default: url }` wrapper
+ * - a structured image object `{ src, width, height, dataUrl }` (SSR)
+ * This helper normalises every shape to a plain, usable URL string.
  */
-export const LOGO_URL: string =
-  typeof logoUrlRaw === 'string' ? logoUrlRaw : (logoUrlRaw as unknown as { default: string }).default;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const raw: any = logoUrlRaw;
 
-if (typeof window !== 'undefined') {
-  console.log('[logo-url] raw type:', typeof logoUrlRaw, 'keys:', Object.keys(logoUrlRaw as unknown as object), 'str:', JSON.stringify(logoUrlRaw).substring(0, 200));
-}
+export const LOGO_URL: string =
+  typeof raw === 'string' && raw
+    ? raw
+    : raw && typeof raw === 'object'
+      ? raw.src || (raw.default as string | undefined) || ''
+      : '';
