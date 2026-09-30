@@ -1,153 +1,72 @@
-"use client"
+﻿"use client";
 
-import { useMemo } from "react"
-import { motion, type Variants, type HTMLMotionProps } from "motion/react"
-import { cn } from "../../lib/utils"
+import { useEffect, useMemo, useRef, useState, type ComponentType } from 'react';
+import { motion, useScroll, useTransform, type HTMLMotionProps, type MotionValue } from 'motion/react';
+import { cn } from '../../lib/utils';
+import './text-reveal.css';
 
-export interface TextRevealProps extends Omit<HTMLMotionProps<"span">, "children"> {
-  /**
-   * The text content to animate
-   */
-  text: string
-  /**
-   * The animation mode:
-   * - "letter": Animates letter by letter (default)
-   * - "word": Animates word by word
-   */
-  mode?: "letter" | "word"
-  /**
-   * The HTML tag to render as the outer container
-   * @default "span"
-   */
-  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span" | "div"
-  /**
-   * Initial delay before the text animation begins (in seconds)
-   * @default 0.1
-   */
-  delay?: number
-  /**
-   * The stagger time between animated elements (in seconds)
-   * @default 0.025
-   */
-  stagger?: number
-  /**
-   * The duration of the fade and blur transition for each element (in seconds)
-   * @default 0.5
-   */
-  duration?: number
-  /**
-   * The initial CSS blur filter value (e.g. "8px", "4px")
-   * @default "8px"
-   */
-  blur?: string
-  /**
-   * Initial vertical offset displacement (Y-axis)
-   * @default 0
-   */
-  y?: number
-  /**
-   * Whether to animate once when in view, or repeat every time it enters the viewport
-   * @default true
-   */
-  once?: boolean
+export interface TextRevealProps extends Omit<HTMLMotionProps<'span'>, 'children'> {
+  text: string;
+  mode?: 'letter' | 'word';
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div';
+  delay?: number;
+  stagger?: number;
+  duration?: number;
+  blur?: string;
+  y?: number;
+  /** False ties the stagger to scroll position, including reverse scrolling. */
+  once?: boolean;
 }
 
+function RevealUnit({ children, progress, start, end, blur, y, enabled }: {
+  children: string; progress: MotionValue<number>; start: number; end: number;
+  blur: number; y: number; enabled: boolean;
+}) {
+  const amount = useTransform(progress, [start, end], [0, 1]);
+  const opacity = useTransform(amount, value => 1 - Math.pow(1 - value, 2));
+  const filter = useTransform(amount, value => value >= 1 ? 'none' : `blur(${((1 - value) * blur).toFixed(2)}px)`);
+  const translateY = useTransform(amount, value => (1 - value) * y);
+  return <motion.span className="text-reveal__unit" style={enabled ? { opacity, filter, y: translateY } : undefined}>{children}</motion.span>;
+}
+
+/** The supplied blur/stagger effect, driven by scroll rather than a one-shot timer. */
 export function TextReveal({
-  text,
-  mode = "letter",
-  as = "span",
-  delay = 0.1,
-  stagger = 0.025,
-  duration = 0.5,
-  blur = "8px",
-  y = 0,
-  once = true,
-  className,
-  ...props
+  text, mode = 'letter', as = 'span', delay = .05, stagger = .025,
+  duration = .5, blur = '6px', y = 10, once = false, className, ...props
 }: TextRevealProps) {
-  // Memoize variants to prevent unnecessary recalculations on re-render
-  const childVariants = useMemo<Variants>(() => {
-    return {
-      hidden: {
-        opacity: 0,
-        filter: `blur(${blur})`,
-        y: y,
-      },
-      visible: (i: number) => ({
-        opacity: 1,
-        filter: "blur(0px)",
-        y: 0,
-        transition: {
-          duration: duration,
-          delay: delay + i * stagger,
-          ease: "easeOut",
-        },
-      }),
-    }
-  }, [blur, y, duration, delay, stagger])
+  const ref = useRef<HTMLElement>(null);
+  const [enabled, setEnabled] = useState(false);
+  const held = useRef(0);
+  // A longer travel gives each letter time to resolve, then retraces the same
+  // opacity, blur, and lift when the reader scrolls back toward the start.
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.94', 'start 0.46'] });
+  const progress = useTransform(scrollYProgress, value => {
+    held.current = once ? Math.max(held.current, value) : value;
+    return held.current;
+  });
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setEnabled(!preference.matches);
+    sync();
+    preference.addEventListener('change', sync);
+    return () => preference.removeEventListener('change', sync);
+  }, []);
+  const words = useMemo(() => text.split(/(\s+)/), [text]);
+  const count = words.reduce((total, word) => /^\s*$/.test(word) ? total : total + (mode === 'word' ? 1 : Array.from(word).length), 0);
+  const total = Math.max(.01, delay + duration + Math.max(0, count - 1) * stagger);
+  const blurPixels = Math.min(8, Math.max(0, parseFloat(blur) || 0));
+  const Tag = motion[as] as ComponentType<HTMLMotionProps<'span'>>;
+  let index = 0;
 
-  const parentVariants = useMemo<Variants>(() => {
-    return {
-      hidden: {},
-      visible: {},
-    }
-  }, [])
-
-  const words = useMemo(() => text.split(" "), [text])
-
-  // Get the motion tag dynamically
-  const MotionComponent = motion[as] as React.ComponentType<HTMLMotionProps<"span">>
-
-  let charIndex = 0
-
-  return (
-    <MotionComponent
-      variants={parentVariants}
-      initial={props.initial ?? "hidden"}
-      whileInView={props.whileInView ?? "visible"}
-      viewport={props.viewport ?? { once, amount: 0.2 }}
-      className={cn("inline-block", className)}
-      {...props}
-    >
-      {mode === "letter"
-        ? words.map((word, wordIdx) => {
-            return (
-              <span key={wordIdx} className="inline-block whitespace-nowrap">
-                {word.split("").map((char, charIdx) => {
-                  const idx = charIndex++
-                  return (
-                    <motion.span
-                      key={charIdx}
-                      custom={idx}
-                      variants={childVariants}
-                      className="inline-block"
-                    >
-                      {char}
-                    </motion.span>
-                  )
-                })}
-                {wordIdx < words.length - 1 && (
-                  <span className="inline-block">&nbsp;</span>
-                )}
-              </span>
-            )
-          })
-        : words.map((word, wordIdx) => {
-            return (
-              <span key={wordIdx} className="inline-block whitespace-nowrap">
-                <motion.span
-                  custom={wordIdx}
-                  variants={childVariants}
-                  className="inline-block"
-                >
-                  {word}
-                </motion.span>
-                {wordIdx < words.length - 1 && (
-                  <span className="inline-block">&nbsp;</span>
-                )}
-              </span>
-            )
-          })}
-    </MotionComponent>
-  )
+  return <Tag {...props} ref={ref} initial={false} className={cn('text-reveal', className)} data-text-reveal="" data-reveal-ready={enabled ? 'true' : 'false'}>
+    <span className="sr-only">{text}</span>
+    <span aria-hidden="true">{words.map((word, wordIndex) => /^\s*$/.test(word) ? word : <span className="text-reveal__word" key={wordIndex}>
+      {(mode === 'word' ? [word] : Array.from(word)).map((unit, unitIndex) => {
+        const start = (delay + index++ * stagger) / total;
+        return <RevealUnit key={unitIndex} progress={progress} start={start} end={start + duration / total} blur={blurPixels} y={y} enabled={enabled}>
+          {unit}
+        </RevealUnit>;
+      })}
+    </span>)}</span>
+  </Tag>;
 }

@@ -13,6 +13,7 @@ RUN npm ci --omit=dev && mkdir -p /app/data && chown -R node:node /app/data
 COPY --from=build /app/dist ./dist
 COPY server ./server
 COPY shared ./shared
+COPY src/lib ./src/lib
 USER node
 VOLUME ["/app/data"]
 EXPOSE 3001

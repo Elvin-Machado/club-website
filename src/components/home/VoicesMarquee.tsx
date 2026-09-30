@@ -1,5 +1,6 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 import { Reveal } from '../ui/reveal';
+import { TextReveal } from '../ui/text-reveal';
 import './voices-marquee.css';
 
 const reviews = [
@@ -54,12 +55,34 @@ const ReviewCard = ({ profile, name, username, body }: { profile: string; name: 
 };
 
 export default function VoicesMarquee() {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const section = ref.current!;
+    const rows = section.querySelectorAll<HTMLElement>('.vm-marquee-wrapper');
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const visible = new Set<Element>();
+    const sync = () => rows.forEach(row => {
+      row.dataset.running = String(visible.has(row) && !document.hidden && !media.matches);
+    });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => entry.isIntersecting ? visible.add(entry.target) : visible.delete(entry.target));
+      sync();
+    });
+    rows.forEach(row => observer.observe(row));
+    sync();
+    document.addEventListener('visibilitychange', sync);
+    media.addEventListener('change', sync);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', sync);
+      media.removeEventListener('change', sync);
+    };
+  }, []);
   return (
-    <section className="vm-container section-space">
-      <Reveal className="vm-header">
-
-        <h2 className="vm-title">THE VOICES OF NUCLEUS</h2>
-      </Reveal>
+    <section ref={ref} className="vm-container section-space">
+      <div className="vm-header">
+        <TextReveal as="h2" className="vm-title" text="THE VOICES OF NUCLEUS" />
+      </div>
 
       <Reveal className="vm-marquee-wrapper" delay={70}>
         <div className="vm-marquee-content">

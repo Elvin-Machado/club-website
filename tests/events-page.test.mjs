@@ -8,14 +8,17 @@ import { render } from '../dist/server/entry-server.js';
 
 const data = JSON.parse(await readFile(new URL('../shared/public-data.json', import.meta.url), 'utf8'));
 
-test('Experiences renders the immersive ride with its two persistent controls', () => {
+test('Experiences renders desktop controls and event publishing without a server-rendered joystick', () => {
   for (const route of ['/events', '/events/']) {
     const html = render(data, route);
     assert.match(html, /aria-label="Nucleus roller coaster"/);
-    assert.match(html, /class="nx-joystick"/);
+    assert.doesNotMatch(html, /class="nx-joystick"/);
     assert.match(html, /class="nx-map-button"/);
     assert.match(html, /Hold W or D to accelerate/);
-    assert.doesNotMatch(html, /class="site-header|class="nx-toolbar|class="nx-bottom-bar|class="nx-minimap|class="nx-desktop-controls/);
+    assert.match(html, /Add Event/);
+    assert.match(html, /class="nx-keyboard-hint"/);
+    assert.match(html, /aria-label="Ride route map"/);
+    assert.doesNotMatch(html, /class="nx-toolbar|class="nx-bottom-bar|Scenic stop/);
   }
 });
 

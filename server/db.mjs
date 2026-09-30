@@ -18,6 +18,8 @@ export function openDatabase(path = process.env.DATABASE_PATH || './data/nucleus
   const db = new DatabaseSync(path);
   db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;
     CREATE TABLE IF NOT EXISTS content (kind TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, position INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(kind,id));
+    CREATE TABLE IF NOT EXISTS event_photos (id TEXT PRIMARY KEY, kind TEXT NOT NULL DEFAULT 'events' CHECK(kind='events'), event_id TEXT NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, data BLOB NOT NULL, position INTEGER NOT NULL, FOREIGN KEY(kind,event_id) REFERENCES content(kind,id) ON DELETE CASCADE);
+    CREATE INDEX IF NOT EXISTS event_photo_event ON event_photos(event_id,position);
     CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1), body TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS admins (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, admin_id TEXT NOT NULL REFERENCES admins(id) ON DELETE CASCADE, csrf TEXT NOT NULL, expires_at INTEGER NOT NULL);
@@ -44,5 +46,7 @@ export function getSite(db, admin = false) {
   for (const kind of ['events', 'projects', 'team']) {
     site[kind] = db.prepare('SELECT body FROM content WHERE kind=? ORDER BY position,id').all(kind).map(row => JSON.parse(row.body)).filter(item => admin || item.published !== false);
   }
+  const photos = db.prepare('SELECT id,event_id,name FROM event_photos ORDER BY position').all();
+  site.events.forEach(event => { const selected = photos.filter(photo => photo.event_id === event.id); if (selected.length) event.photos = selected.map(photo => ({ id: photo.id, name: photo.name, url: `/api/event-photos/${photo.id}` })); });
   return site;
 }

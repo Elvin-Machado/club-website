@@ -38,8 +38,9 @@
   overflow: hidden;
   user-select: none;
   gap: 20px;
-  margin-bottom: 20px;
-  --duration: 40s;
+  padding-block: 4px;
+  margin-bottom: 12px;
+  --duration: 58s;
 }
 
 .vm-marquee-content {
@@ -49,18 +50,24 @@
   justify-content: space-around;
   gap: 20px;
   min-width: 100%;
-  animation: scroll var(--duration) linear infinite;
+  animation: voices-drift var(--duration) linear infinite;
+  animation-play-state: paused;
+}
+
+.vm-marquee-wrapper[data-running='true'] .vm-marquee-content {
+  animation-play-state: running;
 }
 
 .vm-marquee-wrapper.reverse .vm-marquee-content {
   animation-direction: reverse;
 }
 
-.vm-marquee-wrapper:hover .vm-marquee-content {
+.vm-marquee-wrapper:hover .vm-marquee-content,
+.vm-marquee-wrapper:focus-within .vm-marquee-content {
   animation-play-state: paused;
 }
 
-@keyframes scroll {
+@keyframes voices-drift {
   from {
     transform: translateX(0);
   }
@@ -73,7 +80,6 @@
   position: relative;
   height: 100%;
   width: 320px;
-  cursor: pointer;
   overflow: hidden;
   border: 1px solid var(--line);
   background: #060b0e;
@@ -82,7 +88,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color .35s var(--ease-reveal), background .35s var(--ease-reveal), transform .5s var(--ease-reveal);
 }
 
 .vm-card:hover {
@@ -106,8 +112,15 @@
 }
 
 @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-  .vm-avatar { transition: transform .45s var(--ease-pop); }
-  .vm-card:hover .vm-avatar { transform: scale(1.1) rotate(-4deg); }
+  .vm-avatar { transition: transform .5s var(--ease-reveal); }
+  .vm-card:hover { transform: translateY(-3px); }
+  .vm-card:hover .vm-avatar { transform: scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vm-marquee-wrapper { overflow-x: auto; user-select: text; }
+  .vm-marquee-content { animation: none; }
+  .vm-marquee-content[aria-hidden='true'], .vm-fade-left, .vm-fade-right { display: none; }
 }
 
 .vm-meta {

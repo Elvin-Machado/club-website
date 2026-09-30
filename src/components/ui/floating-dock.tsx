@@ -9,16 +9,29 @@ type Item = { title: string; icon: ReactNode; href: string };
 function DockIcon({ item, mouseX }: { item: Item; mouseX: MotionValue<number> }) {
   const ref = useRef<HTMLAnchorElement>(null);
   const reduced = useReducedMotion();
-  const [focused, setFocused] = useState(false);
+  const focus = useMotionValue(0);
+  const center = useRef(Infinity);
+  useEffect(() => {
+    const measure = () => {
+      const rect = ref.current?.getBoundingClientRect();
+      center.current = rect ? rect.left + rect.width / 2 : Infinity;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (ref.current?.parentElement) observer.observe(ref.current.parentElement);
+    window.addEventListener('resize', measure);
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
+  }, []);
   const distance = useTransform(mouseX, value => {
-    const rect = ref.current?.getBoundingClientRect();
-    return rect ? value - rect.x - rect.width / 2 : Infinity;
+    return Number.isFinite(value) ? value - center.current : Infinity;
   });
-  const size = useSpring(useTransform(distance, [-120, 0, 120], [40, 64, 40]), { mass: .1, stiffness: 180, damping: 15 });
-  const iconSize = useSpring(useTransform(distance, [-120, 0, 120], [19, 30, 19]), { mass: .1, stiffness: 180, damping: 15 });
-  return <NavLink ref={ref} className="fd-link" to={item.href} end onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}>
-    <motion.span className="fd-item" style={{ width: reduced ? 40 : focused ? 58 : size, height: reduced ? 40 : focused ? 58 : size }}>
-      <motion.span className="fd-icon-container" aria-hidden="true" style={{ width: reduced ? 19 : iconSize, height: reduced ? 19 : iconSize }}>{item.icon}</motion.span>
+  const proximity = useTransform(distance, [-120, 0, 120], [0, 1, 0]);
+  const emphasis = useSpring(useTransform(() => Math.max(proximity.get(), focus.get())), { mass: .55, stiffness: 240, damping: 25 });
+  const scale = useTransform(emphasis, [0, 1], [1, 1.45]);
+  const y = useTransform(emphasis, [0, 1], [0, -9]);
+  return <NavLink ref={ref} className="fd-link" to={item.href} end onFocus={() => focus.set(.8)} onBlur={() => focus.set(0)}>
+    <motion.span className="fd-item" style={{ scale: reduced ? 1 : scale, y: reduced ? 0 : y }}>
+      <span className="fd-icon-container" aria-hidden="true">{item.icon}</span>
     </motion.span>
     <span className="fd-title-always">{item.title}</span>
   </NavLink>;

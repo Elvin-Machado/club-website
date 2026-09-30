@@ -1,0 +1,133 @@
+<div class="g-navbar-wrap"><nav id="nav" class="g-navbar"><div class="w-layout-vflex g-navbar-const-wrap"><a data-lenis-start="" data-menu-trigger="close" href="/" aria-current="page" class="g-navbar-title-container w-inline-block w--current"><div class="g-navbar-title-wrap"><div class="g-navbar-title">KT Appliance</div></div></a><div data-lenis-toggle="" data-menu-trigger="toggle" class="g-navbar-button-wrap"><div class="g-navbar-hamburger"></div><div class="g-navbar-hamburger is-lower"></div></div></div></nav><nav data-fullscreen="true" class="g-navbar-body-wrap"><div class="w-layout-vflex g-navbar-top-wrap"><ul class="g-navbar-list"><a href="/" aria-current="page" class="g-navbar-item w-inline-block w--current"><div class="g-navbar-item-dot-wrap"></div><h3 class="g-navbar-item-text">Home</h3></a><a href="/projects" class="g-navbar-item w-inline-block"><div class="g-navbar-item-dot-wrap"></div><h3 class="g-navbar-item-text">Projects</h3></a><a href="/team" class="g-navbar-item w-inline-block"><div class="g-navbar-item-dot-wrap"></div><h3 class="g-navbar-item-text">Team</h3></a><a href="/contact" class="g-navbar-item w-inline-block"><div class="g-navbar-item-dot-wrap"></div><h3 class="g-navbar-item-text">Contact</h3></a></ul><ul class="g-navbar-social-list"><li data-trigger="hover-other focus-other" class="g-navbar-social-item"><a href="https://www.instagram.com/kt_appliance/" target="_blank" class="footer_link_wrap w-inline-block"><div class="footer_link">Instagram</div><div class="footer_link_icon_wrap"><svg width="100%" viewBox="0 0 11 12" fill="none" aria-hidden="true" class="footer_link_icon_svg"><path d="M5 1L10 6M10 6L5 11M10 6H0" stroke="currentColor" stroke-width="0.1em" vector-effect="non-scaling-stroke" stroke-linejoin="bevel" class="u-svg"></path></svg></div></a></li><li data-trigger="hover-other focus-other" class="g-navbar-social-item"><a href="https://www.facebook.com/KTAPPLIANCE/" target="_blank" class="footer_link_wrap w-inline-block"><div class="footer_link">Facebook</div><div class="footer_link_icon_wrap"><svg width="100%" viewBox="0 0 11 12" fill="none" aria-hidden="true" class="footer_link_icon_svg"><path d="M5 1L10 6M10 6L5 11M10 6H0" stroke="currentColor" stroke-width="0.1em" vector-effect="non-scaling-stroke" stroke-linejoin="bevel" class="u-svg"></path></svg></div></a></li><li data-trigger="hover-other focus-other" class="g-navbar-social-item"><a href="https://www.linkedin.com/company/kt-appliance" target="_blank" class="footer_link_wrap w-inline-block"><div class="footer_link">Linkedin</div><div class="footer_link_icon_wrap"><svg width="100%" viewBox="0 0 11 12" fill="none" aria-hidden="true" class="footer_link_icon_svg"><path d="M5 1L10 6M10 6L5 11M10 6H0" stroke="currentColor" stroke-width="0.1em" vector-effect="non-scaling-stroke" stroke-linejoin="bevel" class="u-svg"></path></svg></div></a></li><li data-trigger="hover-other focus-other" class="g-navbar-social-item"><a href="https://x.com/KT_Appliance" target="_blank" class="footer_link_wrap w-inline-block"><div class="footer_link">X.com</div><div class="footer_link_icon_wrap"><svg width="100%" viewBox="0 0 11 12" fill="none" aria-hidden="true" class="footer_link_icon_svg"><path d="M5 1L10 6M10 6L5 11M10 6H0" stroke="currentColor" stroke-width="0.1em" vector-effect="non-scaling-stroke" stroke-linejoin="bevel" class="u-svg"></path></svg></div></a></li></ul></div><div class="g-navbar-footer"><div class="w-layout-vflex g-navbar-footer-list"><div class="w-layout-vflex g-navbar-footer-item"><h4 class="footer_group_title is_bottom">Copyright</h4><div class="footer_bottom_text">© <span data-dynamic-year="">{{year}}</span> KT Appliance</div></div><div class="w-layout-vflex g-navbar-footer-item"><h4 class="footer_group_title is_bottom">Design</h4><a href="https://www.levik.co?utm_source=ktb2b" class="footer_link_wrap w-inline-block"><div class="footer_link">LevikCo</div><div class="footer_link_icon_wrap"><svg width="100%" viewBox="0 0 11 12" fill="none" aria-hidden="true" class="footer_link_icon_svg"><path d="M5 1L10 6M10 6L5 11M10 6H0" stroke="currentColor" stroke-width="0.1em" vector-effect="non-scaling-stroke" stroke-linejoin="bevel" class="u-svg"></path></svg></div></a></div></div></div><div class="g-navbar-body-bg-wrap"><div class="g-navbar-bg-item"></div><div class="g-navbar-bg-item"></div><div class="g-navbar-bg-item"></div><div class="g-navbar-bg-item"></div><div class="g-navbar-bg-item"></div></div><div class="u-embed-css w-embed"></div><div class="u-embed-js w-embed w-script"><script>
+
+// Define the ease variable for consistency
+const menuEase = 'expo.out';
+
+// State tracking
+let isMenuOpen = false;
+
+// Get the toggle trigger elements
+const menuToggle = document.querySelector('[data-menu-trigger="toggle"]');
+
+// Get all close trigger elements
+const menuCloses = document.querySelectorAll('[data-menu-trigger="close"]');
+
+// Get the navbar wrap for class toggling
+const navbarWrap = document.querySelector('.g-navbar-wrap');
+
+// Function to open the menu
+function openMenu() {
+  if (isMenuOpen) return;
+  isMenuOpen = true;
+
+  // Add is_active class immediately
+  if (navbarWrap) {
+    navbarWrap.classList.add('is_active');
+  }
+
+  // Create a GSAP timeline for the open animation
+  const tl = gsap.timeline();
+
+  // Set initial states to prevent blinking
+  gsap.set('.g-navbar-body-wrap', { x: '100%', transformStyle: 'preserve-3d' });
+  gsap.set('.g-navbar-bg-item', { x: '100%', transformStyle: 'preserve-3d' });
+  gsap.set('.g-navbar-item', { opacity: 0, x: '10rem', transformStyle: 'preserve-3d' });
+  gsap.set('.g-navbar-social-item', { opacity: 0, x: '10rem', transformStyle: 'preserve-3d' });
+  gsap.set('.g-navbar-footer-item', { opacity: 0, y: '10rem', transformStyle: 'preserve-3d' });
+
+  // Animate the main wrapper
+  tl.to('.g-navbar-body-wrap', {
+    x: '0%',
+    duration: 1,
+    ease: menuEase
+  }, 0);
+
+  // Animate the background items with stagger
+  tl.to('.g-navbar-bg-item', {
+    x: '0%',
+    duration: 1,
+    ease: menuEase,
+    stagger: 0.075
+  }, 0);
+
+  // Animate the menu items with delay and stagger
+  tl.to('.g-navbar-item', {
+    opacity: 1,
+    x: '0rem',
+    duration: 1,
+    ease: menuEase,
+    stagger: 0.1
+  }, 0.5);
+
+  // Animate the social items with delay and stagger
+  tl.to('.g-navbar-social-item', {
+    opacity: 1,
+    x: '0rem',
+    duration: 1,
+    ease: menuEase,
+    stagger: 0.1
+  }, 0.75);
+
+  // Animate the footer items with stagger
+  tl.to('.g-navbar-footer-item', {
+    opacity: 1,
+    y: '0rem',
+    duration: 1,
+    ease: menuEase,
+    stagger: 0.15
+  }, 0.75);
+}
+
+// Function to close the menu
+function closeMenu() {
+  if (!isMenuOpen) return;
+  isMenuOpen = false;
+
+  // Remove is_active class immediately
+  if (navbarWrap) {
+    navbarWrap.classList.remove('is_active');
+  }
+
+  // Create a GSAP timeline for the close animation
+  const tl = gsap.timeline({
+    onComplete: () => {
+      // Reset initial states after animation completes to prepare for next open
+      gsap.set('.g-navbar-body-wrap', { x: '100%', transformStyle: 'preserve-3d' });
+      gsap.set('.g-navbar-bg-item', { x: '100%', transformStyle: 'preserve-3d' });
+      gsap.set('.g-navbar-item', { opacity: 0, x: '10rem', transformStyle: 'preserve-3d' });
+      gsap.set('.g-navbar-social-item', { opacity: 0, x: '10rem', transformStyle: 'preserve-3d' });
+      gsap.set('.g-navbar-footer-item', { opacity: 0, y: '10rem', transformStyle: 'preserve-3d' });
+    }
+  });
+
+  // Fade out all content items at the same time (no stagger)
+  tl.to(['.g-navbar-item', '.g-navbar-social-item', '.g-navbar-footer-item'], {
+    opacity: 0,
+    duration: 0.35,
+    ease: menuEase
+  }, 0);
+
+ // Animate the main wrapper out, delayed
+  tl.to('.g-navbar-body-wrap', {
+    x: '100%',
+    duration: 1,
+    ease: menuEase
+  }, 0.25);
+}
+
+// Event listeners
+if (menuToggle) {
+  menuToggle.addEventListener('click', () => {
+    if (isMenuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+}
+
+menuCloses.forEach(closeBtn => {
+  closeBtn.addEventListener('click', closeMenu);
+});
+
+</script></div></nav></div>

@@ -1,0 +1,15 @@
+.text-reveal__word, .text-reveal__unit { display: inline-block; }
+.text-reveal__word { white-space: nowrap; }
+span.text-reveal { display: inline-block; }
+/* Focusing an action always makes its label readable, even before its reveal. */
+a:focus-visible .text-reveal__unit,
+button:focus-visible .text-reveal__unit,
+.dp-panel__inner:focus-within .text-reveal__unit,
+.community-actions:focus-within .text-reveal__unit {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .text-reveal__unit { opacity: 1 !important; filter: none !important; transform: none !important; }
+}

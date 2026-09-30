@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. Vite proxies `/api` to the Express server at port 3001. Both processes stop together with Ctrl+C.
+Open **http://127.0.0.1:3000**. Vite proxies `/api` to the Express server at port 3001. Both processes stop together with Ctrl+C.
 
 For the production build and server-rendered preview:
 
@@ -41,16 +41,16 @@ An open intake is required before applications are accepted. A passed deadline c
 
 ## The event ride
 
-The Three.js renderer is loaded only near the event section. The scene includes folded brain hemispheres, neural connections, supported coaster rails, a carriage, and numbered stations generated from published events.
+The Experiences page (`/events`) loads a Three.js coaster around the upright Nucleus sculpture. Three default stations are always present; missing published content gets explicitly labelled preview stations.
 
-- Start the ride, pause/resume, choose a station, or reset to orbit view.
-- The ride pauses when it reaches a station; continue to travel to the next event.
-- Drag the scene in orbit view or use fullscreen. Mouse wheel and mobile vertical scrolling remain available for the page.
-- A list view exposes every event independently of the renderer.
-- Reduced-motion users start in list view and can opt into static 3D station views.
-- A renderer failure or lost graphics context falls back to the event list.
+- Hold W/D or the arrow keys to accelerate; S/A brakes and reverses. Drag to look, use Map to orbit, and Restart to return to the beginning. Phones and tablets with a coarse touch pointer also get a joystick; mouse devices do not.
+- The ride automatically brakes at stations. Continue resumes travel. Opening a dialog freezes the ride.
+- Open **Add Event**, sign in with an existing administrator account, paste event details, and select a photo folder or individual photos. Publishing stores the event, its collision-checked station position, and gallery photos in SQLite for every visitor.
+- Albums accept up to 20 JPG, PNG, WebP or AVIF inputs (12 MB each, 80 MB total). The client processes images one at a time at up to 1280 pixels; uploads are limited to 500 KB per image and 6 MB per album. Galleries load photos only when opened.
+- The station planner checks platform footprints against the logo, buildings, other platforms and other track sections. If the finite track is full, publishing returns an explicit error. Existing overflow events remain accessible from **Events**.
+- Reduced motion disables banking, automatic orbit, and animated map transitions. A renderer failure or lost graphics context falls back to the event list; event publishing and galleries remain available.
 
-No audio, game telemetry, or external graphics service is required. The scene disposes GPU resources on unmount, caps pixel density, and suspends rendering offscreen or in a hidden browser tab.
+The scene uses spatially grouped instancing, distant rail/window detail levels, and a single opaque logo surface. Adaptive quality adjusts pixel ratio and decorative detail using sustained frame times, with a pixel budget for large screens and slower recovery to prevent oscillation. The motor and camera timing do not depend on the quality level. Rendering stops offscreen, in hidden tabs, and behind dialogs; GPU resources are disposed on unmount.
 
 ## Backend and data
 
@@ -65,6 +65,8 @@ Public routes:
 - `POST /api/applications` — validated application submission
 
 Admin routes under `/api/admin` require an authenticated session. Mutations require the session CSRF token. Passwords are salted with scrypt; only hashed session tokens are persisted. Cookies are HttpOnly and SameSite=Strict, and are Secure with a `__Host-` prefix in production. Origin checks, request size limits, rate limits, prepared database statements, and a production CSP are configured.
+
+`PUT /api/admin/experience-events/:uuid` atomically publishes an event, reserves a station and saves its photo album. Request retries reuse the UUID. `GET /api/event-photos/:id` serves only photos belonging to published events. Existing admin edits preserve station positions and albums; deleting an event cascades to its photos. The `event_photos` table is created automatically on startup and is included in the SQLite backup.
 
 Rate limits use process memory, appropriate for this single-instance server. A multi-instance deployment needs a shared limiter and database architecture. A production CAPTCHA can be added if the existing honeypot and rate limits prove insufficient.
 
@@ -105,4 +107,6 @@ npm run check
 
 This type-checks and builds both browser and server bundles, then runs integration tests against temporary databases and local HTTP servers. Coverage includes authorization, CSRF, origin checks, intake closure, validation, duplicates, the application lifecycle, content CRUD, database persistence, and server-rendered production routes.
 
-Visual browser QA still needs a WebGL-enabled browser. Check a narrow mobile viewport, keyboard navigation, reduced motion, pause/resume, all event stops, fullscreen, and list fallback. There are no measured Lighthouse or Core Web Vitals scores in this repository.
+Run `npm run test:browser` for desktop, phone, tablet, photo-folder publishing, independent visitor access, keyboard movement, reduced motion and WebGL fallback checks. It starts Vite on port 3010 and uses an isolated test database; it does not publish to the real club database. Install the test browser first with `npx playwright install chromium` if needed.
+
+Performance measurements depend on the browser and GPU. The browser suite logs frame intervals and render counts; a 60 FPS result on one machine is not a guarantee for all devices. Validate on representative physical phones and tablets before release. There are no measured Lighthouse or Core Web Vitals scores in this repository.

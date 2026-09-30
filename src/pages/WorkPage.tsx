@@ -40,6 +40,6 @@ export default function WorkPage({ projects, settings }: { projects: Project[]; 
       </article>
     </Reveal>)}</div>
     {!projects.length && <div className="empty-state"><p>New projects are taking shape.</p><a className="text-link" href={settings.githubUrl} target="_blank" rel="noreferrer">Follow on GitHub <ArrowUpRight size={17} /></a></div>}
-    <Reveal><Link className="next-page" to="/team"><span><span className="eyebrow">Behind the work</span><strong>Meet the people.</strong></span><ArrowRight size={32} strokeWidth={1.2} /></Link></Reveal>
+
   </section>;
 }

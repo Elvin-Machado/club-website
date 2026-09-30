@@ -7,16 +7,21 @@ import { randomBytes, randomUUID, createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { getSite, hashPassword, verifyPassword } from './db.mjs';
+import { createCoasterTrack } from '../src/lib/event-coaster.ts';
+import { createStationPlanner } from '../src/lib/event-layout.ts';
+import { createExperienceStations } from '../src/lib/experience-stations.ts';
 
 const safeUrl = z.union([z.literal(''), z.url().refine(value => ['https:', 'http:'].includes(new URL(value).protocol), 'Use an https:// URL')]);
 const isoDate = z.union([z.literal(''), z.iso.datetime({ offset: true })]);
-const eventSchema = z.object({ title: z.string().trim().min(2).max(120), description: z.string().trim().min(20).max(1600), startsAt: z.iso.datetime({ offset: true }), endsAt: isoDate, location: z.string().trim().min(2).max(200), category: z.string().trim().min(2).max(60), registrationUrl: safeUrl, published: z.boolean() }).refine(e => !e.endsAt || new Date(e.endsAt) >= new Date(e.startsAt), 'End date must follow the start date');
+const eventSchema = z.object({ title: z.string().trim().min(2).max(120), description: z.string().trim().min(20).max(1600), startsAt: z.iso.datetime({ offset: true }), endsAt: isoDate, location: z.string().trim().min(2).max(200), category: z.string().trim().min(2).max(60), registrationUrl: safeUrl, albumUrl: safeUrl.optional(), published: z.boolean() }).refine(e => !e.endsAt || new Date(e.endsAt) >= new Date(e.startsAt), 'End date must follow the start date');
 const projectSchema = z.object({ title: z.string().trim().min(2).max(120), description: z.string().trim().min(20).max(1600), domain: z.string().trim().min(2).max(60), status: z.string().trim().min(2).max(60), url: safeUrl, repositoryUrl: safeUrl, published: z.boolean() });
 const memberSchema = z.object({ name: z.string().trim().min(2).max(100), role: z.string().trim().min(2).max(100), initials: z.string().trim().min(1).max(4) });
 const settingsSchema = z.object({ recruitmentOpen: z.boolean(), recruitmentMessage: z.string().trim().min(10).max(600), recruitmentDeadline: isoDate, cycle: z.string().trim().min(1).max(50), contactEmail: z.email().max(254), instagramUrl: safeUrl, githubUrl: safeUrl, linkedinUrl: safeUrl });
 const applicationSchema = z.object({ name: z.string().trim().min(2).max(100), email: z.email().max(254).transform(e => e.toLowerCase()), year: z.enum(['1', '2', '3', '4']), domain: z.enum(['aiml', 'web', 'dsa']), motivation: z.string().trim().min(30).max(1600), portfolio: safeUrl, consent: z.literal(true), website: z.literal('').optional() });
 const hashToken = token => createHash('sha256').update(token).digest('hex');
 const applicationRow = row => ({ id: row.id, name: row.name, email: row.email, year: row.year, domain: row.domain, motivation: row.motivation, portfolio: row.portfolio, cycle: row.cycle, status: row.status, createdAt: row.created_at });
+const experienceTrack = createCoasterTrack(), stationPlanner = createStationPlanner(experienceTrack);
+const photoSchema = z.object({ name: z.string().trim().min(1).max(180), mime: z.enum(['image/webp', 'image/jpeg', 'image/png']), data: z.string().max(700_000).regex(/^[A-Za-z0-9+/]+={0,2}$/) });
 
 export function createApp(db, { production = process.env.NODE_ENV === 'production', origin = process.env.APP_ORIGIN, dist = resolve('dist/client'), limits = true, render } = {}) {
   const app = express();
@@ -24,9 +29,10 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
   app.use(compression({ threshold: 1024 }));
   if (process.env.TRUST_PROXY === '1') app.set('trust proxy', 1);
   app.use(helmet({ contentSecurityPolicy: production ? { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'"], imgSrc: ["'self'", 'data:'], connectSrc: ["'self'"], fontSrc: ["'self'"], objectSrc: ["'none'"], frameAncestors: ["'none'"] } } : false, strictTransportSecurity: production }));
-  app.use('/api', express.json({ limit: '48kb' }));
+  const smallJson = express.json({ limit: '48kb' });
+  app.use('/api', (req, res, next) => /^\/admin\/experience-events\//.test(req.path) ? next() : smallJson(req, res, next));
   app.use('/api', (_req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
-  const allowed = new Set(production ? [origin] : [origin, 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3001', 'http://127.0.0.1:3001']);
+  const allowed = new Set(production ? [origin] : [origin, 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3001', 'http://127.0.0.1:3001']);
   app.use('/api', (req, res, next) => {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.headers.origin && !allowed.has(req.headers.origin)) return res.status(403).json({ error: 'This request did not come from the Nucleus website.' });
     next();
@@ -35,6 +41,11 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
   app.use('/api', limiter(400, 60_000));
   app.get('/api/health', (_req, res) => { db.prepare('SELECT 1').get(); res.json({ status: 'ok' }); });
   app.get('/api/site', (_req, res) => res.json(getSite(db)));
+  app.get('/api/event-photos/:id', (req, res) => {
+    const photo = db.prepare("SELECT p.mime,p.data,c.body FROM event_photos p JOIN content c ON c.kind=p.kind AND c.id=p.event_id WHERE p.id=?").get(req.params.id);
+    if (!photo || !JSON.parse(photo.body).published) return res.status(404).json({ error: 'Photo not found.' });
+    res.type(photo.mime).send(Buffer.from(photo.data));
+  });
 
   const cookieName = production ? '__Host-nucleus_session' : 'nucleus_session';
   const cookieOptions = { httpOnly: true, sameSite: 'strict', secure: production, path: '/', maxAge: 12 * 60 * 60 * 1000 };
@@ -60,6 +71,38 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
   app.get('/api/admin/session', auth, (req, res) => res.json({ email: req.session.email, csrf: req.session.csrf }));
   app.post('/api/admin/logout', auth, (req, res) => { db.prepare('DELETE FROM sessions WHERE token_hash=?').run(req.session.token_hash); res.clearCookie(cookieName, { ...cookieOptions, maxAge: undefined }).json({ ok: true }); });
   app.get('/api/admin/site', auth, (_req, res) => res.json(getSite(db, true)));
+  app.put('/api/admin/experience-events/:id', auth, limiter(20, 60_000), express.json({ limit: '9mb' }), (req, res) => {
+    const id = z.uuid().parse(req.params.id);
+    const event = eventSchema.parse(req.body.event);
+    const photos = z.array(photoSchema).max(20).parse(req.body.photos ?? []);
+    const existing = getSite(db, true).events.find(item => item.id === id);
+    // A retried request cannot create duplicate events or duplicate photo blobs.
+    if (existing) return res.json(existing);
+    const stations = createExperienceStations(getSite(db).events);
+    const occupied = stationPlanner.forEvents(stations.map(station => station.event)).filter(Boolean);
+    const placement = stationPlanner.next(occupied);
+    if (!placement) return res.status(409).json({ error: 'The track has no safe space for another station. Unpublish an event in the control room before adding one.' });
+    let bytes = 0;
+    const images = photos.map(photo => {
+      const data = Buffer.from(photo.data, 'base64'); bytes += data.length;
+      const valid = photo.mime === 'image/webp' ? data.toString('ascii', 0, 4) === 'RIFF' && data.toString('ascii', 8, 12) === 'WEBP'
+        : photo.mime === 'image/png' ? data.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+        : data[0] === 255 && data[1] === 216 && data[2] === 255;
+      if (!valid || data.length > 500_000 || data.length < 12) throw new z.ZodError([{ code: 'custom', path: ['photos'], message: 'Use valid compressed JPG, PNG or WebP photos under 500 KB each.' }]);
+      return { ...photo, id: randomUUID(), data };
+    });
+    if (bytes > 6_000_000) return res.status(413).json({ error: 'Photos must total less than 6 MB after compression.' });
+    const saved = { id, ...event, published: true, trackPosition: placement.distance / experienceTrack.getLength() };
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      const position = db.prepare("SELECT COALESCE(MAX(position),-1)+1 AS n FROM content WHERE kind='events'").get().n;
+      db.prepare("INSERT INTO content(kind,id,body,position) VALUES('events',?,?,?)").run(id, JSON.stringify(saved), position);
+      const insert = db.prepare('INSERT INTO event_photos(id,event_id,name,mime,data,position) VALUES(?,?,?,?,?,?)');
+      images.forEach((photo, index) => insert.run(photo.id, id, photo.name, photo.mime, photo.data, index));
+      db.exec('COMMIT');
+    } catch (error) { db.exec('ROLLBACK'); throw error; }
+    res.status(201).json(getSite(db).events.find(item => item.id === id));
+  });
   app.put('/api/admin/settings', auth, (req, res) => {
     const data = settingsSchema.parse(req.body);
     if (data.recruitmentOpen && data.recruitmentDeadline && new Date(data.recruitmentDeadline).getTime() <= Date.now()) return res.status(400).json({ error: 'Choose a future deadline before opening recruitment.' });
@@ -69,7 +112,12 @@ export function createApp(db, { production = process.env.NODE_ENV === 'productio
   app.put('/api/admin/content/:kind/:id', auth, (req, res) => {
     const { kind, id } = req.params;
     if (!schemas[kind] || !/^[a-zA-Z0-9_-]{1,80}$/.test(id)) return res.status(400).json({ error: 'Invalid content identifier.' });
-    const data = { id, ...schemas[kind].parse(req.body) };
+    const previous = db.prepare('SELECT body FROM content WHERE kind=? AND id=?').get(kind, id);
+    const trackPosition = kind === 'events' && previous ? JSON.parse(previous.body).trackPosition : undefined;
+    // Creation order belongs to the server. Editing a role must not turn an
+    // established member into a new foundation block; legacy dates stay absent.
+    const createdAt = kind === 'team' ? (previous ? JSON.parse(previous.body).createdAt : new Date().toISOString()) : undefined;
+    const data = { id, ...schemas[kind].parse(req.body), ...(trackPosition !== undefined ? { trackPosition } : {}), ...(createdAt !== undefined ? { createdAt } : {}) };
     const position = db.prepare('SELECT COALESCE(MAX(position),-1)+1 AS n FROM content WHERE kind=?').get(kind).n;
     db.prepare('INSERT INTO content(kind,id,body,position) VALUES(?,?,?,?) ON CONFLICT(kind,id) DO UPDATE SET body=excluded.body').run(kind, id, JSON.stringify(data), position);
     res.json(data);

@@ -1,32 +1,36 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 
 type RevealProps = {
   children: ReactNode;
   className?: string;
   delay?: number;
-  variant?: 'rise' | 'pop';
+  variant?: 'rise' | 'pop' | 'mask';
   /** Stagger the marked data-reveal-item descendants as they enter view. */
   stagger?: number;
 };
 
-// Content is visible in SSR; only the enhanced client prepares an entrance.
-export function Reveal({ children, className = '', delay = 0, variant = 'rise', stagger = 0 }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
+type RevealOptions = Pick<RevealProps, 'delay' | 'variant' | 'stagger'> & { enabled?: boolean; selector?: string };
+
+// Also works on existing elements, without adding layout wrappers.
+export function useReveal(ref: RefObject<HTMLElement | null>, { delay = 0, variant = 'rise', stagger = 0, enabled = true, selector = '[data-reveal-item]' }: RevealOptions = {}) {
   useEffect(() => {
     const element = ref.current;
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!element || media.matches || !('IntersectionObserver' in window) || !element.animate) return;
+    if (!enabled || !element || media.matches || !('IntersectionObserver' in window) || !element.animate) return;
     const compact = window.matchMedia('(max-width: 760px)').matches;
-    const items = stagger > 0 ? Array.from(element.querySelectorAll<HTMLElement>('[data-reveal-item]')) : [];
+    const items = stagger > 0 ? Array.from(element.querySelectorAll<HTMLElement>(selector)) : [];
     const targets = items.length ? items : [element];
     const animations = new Map<HTMLElement, Animation>();
     const frames: Keyframe[] = variant === 'pop' ? [
       { opacity: 0, transform: `translateY(${compact ? 20 : 34}px) scale(.94)`, offset: 0, easing: 'cubic-bezier(.16,1,.3,1)' },
       { opacity: 1, transform: `translateY(-2px) scale(${compact ? 1.006 : 1.012})`, offset: .72, easing: 'cubic-bezier(.33,0,.2,1)' },
       { opacity: 1, transform: 'translateY(0) scale(1)', offset: 1 },
+    ] : variant === 'mask' ? [
+      { opacity: 0, transform: 'translateY(110%) rotate(3deg)', transformOrigin: '0% 100%' },
+      { opacity: 1, transform: 'translateY(0) rotate(0deg)', transformOrigin: '0% 100%' },
     ] : [
-      { opacity: 0, transform: `translateY(${compact ? 20 : 32}px) scale(.985)` },
-      { opacity: 1, transform: 'translateY(0) scale(1)' },
+      { opacity: 0, transform: `translateY(${compact ? 16 : 24}px)` },
+      { opacity: 1, transform: 'translateY(0)' },
     ];
     const observer = new IntersectionObserver(entries => {
       // Only stagger items entering together; a later row never waits for earlier rows.
@@ -59,6 +63,12 @@ export function Reveal({ children, className = '', delay = 0, variant = 'rise', 
     element.addEventListener('focusin', showFocused);
     media.addEventListener('change', stop);
     return () => { clear(); element.removeEventListener('focusin', showFocused); media.removeEventListener('change', stop); };
-  }, [delay, variant, stagger]);
+  }, [ref, delay, variant, stagger, enabled, selector]);
+}
+
+// Content is visible in SSR; only the enhanced client prepares an entrance.
+export function Reveal({ children, className = '', delay = 0, variant = 'rise', stagger = 0 }: RevealProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  useReveal(ref, { delay, variant, stagger });
   return <div ref={ref} className={className}>{children}</div>;
 }

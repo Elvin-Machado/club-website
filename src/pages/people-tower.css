@@ -1,0 +1,83 @@
+.people-page { --mint: #c3e5c8; --mint-rgb: 195 229 200; --muted: #93ac97; --line: rgb(195 229 200 / .14); --line-strong: rgb(195 229 200 / .34); --surface: #080e09; --wash: rgb(195 229 200 / .05); --tower-ink: #c3e5c8; --tower-paper: #0d2b1f; color: var(--mint); background: var(--bg, #000); }
+.people-tower { position: relative; }
+.people-tower__stage { position: relative; height: calc(100svh - var(--header-height)); min-height: 280px; overflow: hidden; isolation: isolate; background: linear-gradient(#020d07, #030f08 72%, #040c07); }
+[data-tower-status='ready'] .people-tower { height: var(--tower-length); }
+[data-tower-status='ready'] .people-tower__stage { position: sticky; top: var(--header-height); }
+.people-tower__world { position: absolute; inset: 0; }
+.people-tower__world > canvas, .people-tower__labels { position: absolute; inset: 0; display: block; pointer-events: none; }
+.people-tower__world > canvas { pointer-events: auto; touch-action: pan-y; cursor: grab; }
+.people-tower__world[data-dragging] > canvas { cursor: grabbing; }
+.people-tower__hint { position: absolute; inset: auto var(--gutter) 82px; z-index: 2; max-width: 420px; font: 11px/1.6 var(--mono); color: #d4eadc; opacity: var(--tower-intro, 1); pointer-events: none; }
+.people-tower__hint[hidden] { display: none; }
+.people-tower__rebuild { margin-left: auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 13px; border: 1px solid var(--line-strong); border-radius: 3px; background: #173225; color: var(--mint); font: 11px var(--mono); }
+.people-tower__rebuild:hover { background: #284936; }
+.people-tower__rebuild:focus-visible, .people-tower__picker select:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+.people-tower__topline { position: absolute; z-index: 3; inset: 25px var(--gutter) auto; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.people-tower__skip { display: inline-flex; align-items: center; gap: 12px; min-height: 40px; font: 11px var(--mono); color: var(--muted); }
+.people-tower__skip:hover { color: var(--mint); }
+.people-tower__hud { position: absolute; z-index: 3; inset: auto var(--gutter) 23px; display: flex; align-items: center; gap: 24px; }
+.people-tower__hud[hidden] { display: none; }
+.people-tower__counter { display: flex; gap: 10px; font: 11px var(--mono); }
+.people-tower__counter > span:last-child { color: var(--muted); }
+.people-tower__track { height: 1px; background: var(--line); flex: 1; }
+.people-tower__track > span { display: block; height: 100%; background: var(--mint); transform: scaleX(var(--tower-progress, 0)); transform-origin: left; }
+.people-tower__picker select { max-width: 210px; background: #050e09; color: var(--mint); border: 1px solid var(--line); border-radius: 3px; padding: 11px; min-height: 40px; font: 11px var(--mono); color-scheme: dark; }
+.people-tower__finish { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 27px; text-align: center; pointer-events: none; opacity: var(--tower-outro, 0); transform: translateY(calc((1 - var(--tower-outro, 0)) * 28px)); }
+.people-tower__finish > p { font-size: clamp(84px, 14vw, 200px); line-height: .82; letter-spacing: -.07em; }
+.people-tower__finish > span:last-child { display: flex; gap: 15px; align-items: center; font: 11px var(--mono); color: var(--muted); }
+
+/* This identity surface shares the block's world transform through CSS3DRenderer. */
+.tower-profile { position: relative; background: var(--tower-paper); color: var(--tower-ink); border: 1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius: 6px; overflow: hidden; backface-visibility: hidden; pointer-events: none; }
+.tower-profile::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(color-mix(in srgb, currentColor 6%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, currentColor 6%, transparent) 1px, transparent 1px); background-size: 48px 48px; mask-image: linear-gradient(120deg, transparent, black); }
+.tower-profile::after { content: ''; position: absolute; width: 61%; aspect-ratio: 1; right: -8%; top: 8%; border: 1px solid color-mix(in srgb, currentColor 18%, transparent); border-radius: 50%; box-shadow: 0 0 0 50px color-mix(in srgb, currentColor 4%, transparent), 0 0 0 100px color-mix(in srgb, currentColor 3%, transparent); }
+.tower-profile__meta { position: absolute; z-index: 2; inset: 27px 32px auto; display: flex; justify-content: space-between; gap: 20px; font: 11px/1.4 var(--mono); letter-spacing: .12em; }
+.tower-profile__monogram { position: absolute; top: 9%; right: 5%; font: italic 400 var(--profile-monogram)/1 var(--serif); letter-spacing: -.11em; opacity: .17; }
+.tower-profile__cross { position: absolute; top: 24%; left: 4%; font: 50px/1 var(--mono); font-weight: 400; opacity: .45; }
+.tower-profile__copy { position: absolute; z-index: 2; bottom: 11%; left: 5%; right: 5%; }
+.tower-profile__role { display: flex; align-items: center; gap: 12px; margin-bottom: 23px; font: 12px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .15em; }
+.tower-profile__role::before { content: ''; display: inline-block; width: 22px; height: 1px; background: currentColor; }
+.tower-profile__name { font: 400 var(--profile-name)/.91 'Bebas Neue', Impact, sans-serif; letter-spacing: -.02em; text-transform: uppercase; }
+.tower-profile__name > span { display: block; }
+.tower-profile__name > span:last-child { opacity: .8; }
+.tower-profile__footer { position: absolute; inset: auto 5% 4%; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, currentColor 35%, transparent); font: 10px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .1em; }
+.people-roster { padding-block: 85px 80px; scroll-margin-top: calc(var(--header-height) + 20px); }
+.people-roster__heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; margin-bottom: 35px; }
+.people-roster__heading h2 { margin-top: 18px; font-size: clamp(35px, 5vw, 64px); }
+.people-roster__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+.people-roster__member { position: relative; min-width: 0; padding: 25px 27px 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; }
+.people-roster__initials { font: 50px/1.1 var(--serif); letter-spacing: -.07em; padding-bottom: 32px; color: var(--mint); }
+.people-roster__number { position: absolute; top: 28px; right: 27px; color: var(--muted); font: 10px var(--mono); }
+.people-roster__member h3 { font: 400 17px/1.5 Inter, sans-serif; letter-spacing: -.03em; padding-right: 20px; }
+.people-roster__member p { color: var(--muted); font-size: 12px; margin-top: 5px; }
+.people-roster__reveal { position: absolute; right: 13px; bottom: 16px; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--mint); }
+.people-roster__reveal:hover { background: var(--wash); }
+@media (max-width: 760px) {
+  .people-tower__topline { inset-block-start: 15px; }
+  .people-tower__hud { gap: 14px; bottom: 17px; }
+  .people-tower__rebuild { gap: 5px; padding: 8px; font-size: 10px; }
+  .people-tower__hint { max-width: 300px; font-size: 10px; }
+  .people-tower__picker select { max-width: 175px; font-size: 10px; }
+  .tower-profile__meta { inset: 22px 20px auto; font-size: 9px; }
+  .tower-profile__copy { bottom: 13%; left: 7%; right: 7%; }
+  .tower-profile__role { font-size: 10px; letter-spacing: .09em; margin-bottom: 20px; }
+  .tower-profile__monogram { top: 17%; right: 9%; }
+  .tower-profile__cross { top: 21%; left: 7%; font-size: 35px; }
+  .tower-profile__footer { font-size: 8px; inset-inline: 7%; }
+  .people-roster__heading { align-items: flex-start; flex-direction: column; gap: 20px; }
+  .people-roster__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .people-roster__member { padding: 22px 19px; }
+  .people-roster__member h3 { font-size: 15px; }
+  .people-roster__member p { font-size: 11px; padding-right: 20px; }
+  .people-roster__number { top: 24px; right: 19px; }
+  .people-roster__reveal { right: 5px; bottom: 7px; }
+}
+@media (max-width: 420px) {
+  .people-tower__hud { gap: 8px; }
+  .people-tower__picker { flex: 1; min-width: 0; }
+  .people-tower__picker select { width: 100%; max-width: 150px; }
+  .people-tower__counter { gap: 5px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tower-status] .people-tower { height: auto; }
+  [data-tower-status] .people-tower__stage { position: relative; top: 0; }
+}

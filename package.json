@@ -10,12 +10,14 @@
     "start": "node server/index.mjs",
     "admin:create": "node server/create-admin.mjs",
     "test": "node --test tests/*.test.mjs",
+    "test:browser": "playwright test",
     "check": "npm run build && npm test"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
     "@studio-freight/lenis": "^1.0.42",
+    "cannon-es": "^0.20.0",
     "clsx": "^2.1.1",
     "compression": "^1.8.2",
     "express": "^5.1.0",

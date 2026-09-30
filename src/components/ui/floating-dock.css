@@ -1,9 +1,9 @@
 ﻿.site-navigation { margin-inline: auto; }
 .fd-desktop { display: flex; align-items: center; gap: 10px; height: 84px; }
 .fd-link { width: 76px; height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; padding-bottom: 5px; position: relative; }
-.fd-item { display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 50%; transition: border-color .2s, background .2s; }
+.fd-item { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 40px; height: 40px; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 50%; transition: border-color .3s var(--ease-reveal), background .3s var(--ease-reveal); }
 .fd-link:hover .fd-item, .fd-link.active .fd-item { background: var(--wash); border-color: var(--line-strong); }
-.fd-icon-container { display: flex; align-items: center; justify-content: center; }
+.fd-icon-container { display: flex; align-items: center; justify-content: center; width: 19px; height: 19px; }
 .fd-icon-container svg { width: 100%; height: 100%; }
 .fd-title-always { font-size: 8px; line-height: 1; font-weight: 500; letter-spacing: .07em; white-space: nowrap; text-transform: uppercase; color: var(--muted); }
 .fd-link.active .fd-title-always { color: var(--mint); }
@@ -14,7 +14,7 @@
   .fd-mobile { position: relative; display: block; }
   .fd-mobile .fd-mobile-toggle { border-radius: 50%; width: 44px; height: 44px; background: var(--surface); }
   .fd-mobile-nav { position: absolute; top: calc(100% + 14px); right: 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
-  .fd-mobile-link { display: flex; align-items: center; gap: 12px; animation: dock-enter .2s ease-out both; }
+  .fd-mobile-link { display: flex; align-items: center; gap: 12px; animation: dock-enter .45s var(--ease-reveal) both; }
   .fd-mobile-link > span:first-child { padding: 12px 15px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 7px; white-space: nowrap; font-size: 13px; }
   .fd-mobile-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--surface); }
   .fd-mobile-link.active > span { background: var(--surface-raised); border-color: var(--mint); }

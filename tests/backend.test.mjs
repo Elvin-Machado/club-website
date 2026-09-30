@@ -25,6 +25,77 @@ async function fixture(fn, options = {}) {
 }
 const applicant = { name: 'Test Student', email: 'student@example.com', year: '2', domain: 'aiml', motivation: 'I would like to build practical AI applications with the student community.', portfolio: 'https://github.com/example', consent: true, website: '' };
 
+test('new team members get immutable server creation dates and legacy edits preserve foundation ordering', () => fixture(async ({ request, login, db }) => {
+  const headers = await login(), member = { name: 'New Member', role: 'Member', initials: 'NM', createdAt: '2000-01-01T00:00:00Z' };
+  const before = Date.now();
+  const created = await request('/admin/content/team/new-member', 'PUT', member, headers).then(response => response.json());
+  assert.ok(Date.parse(created.createdAt) >= before);
+  const updated = await request('/admin/content/team/new-member', 'PUT', { ...member, role: 'President' }, headers).then(response => response.json());
+  assert.equal(updated.createdAt, created.createdAt);
+  const legacy = getSite(db).team[0];
+  const saved = await request(`/admin/content/team/${legacy.id}`, 'PUT', { ...legacy, createdAt: created.createdAt }, headers).then(response => response.json());
+  assert.equal(saved.createdAt, undefined);
+  const publicMember = (await request('/site').then(response => response.json())).team.at(-1);
+  assert.equal(publicMember.id, 'new-member'); assert.equal(publicMember.createdAt, created.createdAt);
+}));
+
+test('publishing an experience requires auth and CSRF, persists photos and a safe station, and is idempotent', () => fixture(async ({ request, login, db, base }) => {
+  const id = 'baf123c4-e81b-43df-831d-e85916d1ad80', path = `/admin/experience-events/${id}`;
+  const event = { ...getSite(db).events[0], title: 'Photo workshop' };
+  const image = { name: 'workshop.png', mime: 'image/png', data: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aN4sAAAAASUVORK5CYII=' };
+  const body = { event, photos: [image] };
+  assert.equal((await request(path, 'PUT', body)).status, 401);
+  const headers = await login();
+  assert.equal((await request(path, 'PUT', body, { Cookie: headers.Cookie })).status, 403);
+  assert.equal((await request(path, 'PUT', body, { ...headers, Origin: 'https://elsewhere.example' })).status, 403);
+  const result = await request(path, 'PUT', body, { ...headers, Origin: 'http://127.0.0.1:3000' });
+  assert.equal(result.status, 201); const saved = await result.json();
+  assert.ok(saved.trackPosition > 0 && saved.trackPosition < 1); assert.equal(saved.photos.length, 1);
+  assert.equal((await request(path, 'PUT', body, headers)).status, 200);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM event_photos').get().n, 1);
+  const photo = await fetch(base + saved.photos[0].url); assert.equal(photo.status, 200); assert.match(photo.headers.get('content-type'), /image\/png/);
+  assert.equal(Buffer.from(await photo.arrayBuffer()).toString('base64'), image.data);
+  const publicEvent = (await request('/site').then(r => r.json())).events.find(e => e.id === id);
+  assert.deepEqual(publicEvent.photos, saved.photos);
+  await request(`/admin/content/events/${id}`, 'PUT', { ...event, published: false }, headers);
+  assert.equal((await fetch(base + saved.photos[0].url)).status, 404);
+  assert.equal(getSite(db, true).events.find(e => e.id === id).trackPosition, saved.trackPosition);
+  await request(`/admin/content/events/${id}`, 'DELETE', undefined, headers);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM event_photos').get().n, 0);
+}));
+
+test('photo-free experiences persist album and registration links and reject unsafe URLs', () => fixture(async ({ request, login, db }) => {
+  const headers = await login(), id = 'ddf123c4-e81b-43df-831d-e85916d1ad81';
+  const event = { ...getSite(db).events[0], title: 'Linked album workshop', albumUrl: 'https://drive.google.com/drive/folders/example', registrationUrl: 'https://example.com/register' };
+  for (const patch of [{ albumUrl: 'javascript:alert(1)' }, { albumUrl: 'data:text/html,hello' }, { registrationUrl: 'file:///private' }]) {
+    assert.equal((await request(`/admin/experience-events/${id}`, 'PUT', { event: { ...event, ...patch } }, headers)).status, 400);
+  }
+  const result = await request(`/admin/experience-events/${id}`, 'PUT', { event, photos: [] }, headers);
+  assert.equal(result.status, 201); const saved = await result.json();
+  assert.equal(saved.albumUrl, event.albumUrl); assert.equal(saved.registrationUrl, event.registrationUrl);
+  const published = (await request('/site').then(r => r.json())).events.find(e => e.id === id);
+  assert.equal(published.albumUrl, event.albumUrl); assert.equal(published.registrationUrl, event.registrationUrl);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM event_photos').get().n, 0);
+}));
+
+test('invalid photos are rejected atomically and track capacity returns a useful error', () => fixture(async ({ request, login, db }) => {
+  const headers = await login(), event = getSite(db).events[0];
+  const bad = { name: 'fake.png', mime: 'image/png', data: Buffer.from('<svg>not a photo</svg>').toString('base64') };
+  const badId = 'f8227533-2857-4d28-a491-52d86ee91b76';
+  assert.equal((await request(`/admin/experience-events/${badId}`, 'PUT', { event, photos: [bad] }, headers)).status, 400);
+  assert.equal(getSite(db).events.length, 3);
+  let added = 0;
+  for (let i = 0; i < 30; i++) {
+    const id = `f8227533-2857-4d28-a491-${String(i).padStart(12, '0')}`;
+    const response = await request(`/admin/experience-events/${id}`, 'PUT', { event, photos: [] }, headers);
+    if (response.status === 409) { assert.match((await response.json()).error, /no safe space/); break; }
+    assert.equal(response.status, 201); added++;
+  }
+  assert.ok(added > 3 && added < 30);
+  const positions = getSite(db).events.filter(e => e.trackPosition !== undefined).map(e => e.trackPosition);
+  assert.equal(new Set(positions).size, added);
+}));
+
 test('public API exposes published club content without private application data', () => fixture(async ({ request, db }) => {
   db.prepare('INSERT INTO content VALUES(?,?,?,?)').run('events', 'draft', JSON.stringify({ id: 'draft', title: 'Hidden draft', published: false }), 99);
   const response = await request('/site'); assert.equal(response.status, 200);
@@ -91,6 +162,10 @@ test('database content survives a close and reopen without reseeding over edits'
     db = openDatabase(path); const settings = getSite(db).settings; settings.cycle = 'persisted-intake';
     db.prepare('UPDATE settings SET body=?').run(JSON.stringify(settings)); db.close(); db = openDatabase(path);
     assert.equal(getSite(db).settings.cycle, 'persisted-intake'); assert.equal(getSite(db).events.length, 3);
+    db.prepare('INSERT INTO event_photos(id,event_id,name,mime,data,position) VALUES(?,?,?,?,?,?)').run('persistent-photo', getSite(db).events[0].id, 'memory.png', 'image/png', Buffer.from('saved image bytes'), 0);
+    db.close(); db = openDatabase(path);
+    assert.equal(getSite(db).events[0].photos[0].id, 'persistent-photo');
+    assert.equal(Buffer.from(db.prepare('SELECT data FROM event_photos WHERE id=?').get('persistent-photo').data).toString(), 'saved image bytes');
   } finally { db?.close(); rmSync(directory, { recursive: true, force: true }); }
 });
 test('production renders the animated home and club pages, escapes data, and hides admin from indexing', async () => {

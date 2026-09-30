@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "../../lib/utils";
+import { motion, useSpring } from "motion/react";
 import React, {
   createContext,
   useState,
@@ -24,31 +25,65 @@ export const CardContainer = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMouseEntered, setIsMouseEntered] = useState(false);
+  const rotateX = useSpring(0, { stiffness: 180, damping: 26, mass: .7 });
+  const rotateY = useSpring(0, { stiffness: 180, damping: 26, mass: .7 });
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current || window.matchMedia('(prefers-reduced-motion: reduce), (hover: none)').matches) return;
-    const { left, top, width, height } =
-      containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - left - width / 2) / 25;
-    const y = (e.clientY - top - height / 2) / 25;
-    containerRef.current.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-  };
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce), (hover: none)').matches) return;
-    setIsMouseEntered(true);
-    if (!containerRef.current) return;
-  };
-
-  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    setIsMouseEntered(false);
-    containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
-  };
+  useEffect(() => {
+    const container = containerRef.current!;
+    const media = window.matchMedia('(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)');
+    let bounds: DOMRect | undefined;
+    let frame = 0;
+    let pointerX = 0, pointerY = 0;
+    const update = () => {
+      frame = 0;
+      // Measure the stable outer container, never the surface being tilted.
+      bounds ??= container.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+      const x = Math.max(-1, Math.min(1, (pointerX - bounds.left) / bounds.width * 2 - 1));
+      const y = Math.max(-1, Math.min(1, (pointerY - bounds.top) / bounds.height * 2 - 1));
+      rotateX.set(-y * 4); rotateY.set(x * 6);
+      container.style.setProperty('--card-x', `${(x + 1) * 50}%`);
+      container.style.setProperty('--card-y', `${(y + 1) * 50}%`);
+    };
+    const move = (event: PointerEvent) => {
+      if (!media.matches || event.pointerType !== 'mouse') return;
+      pointerX = event.clientX; pointerY = event.clientY;
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const enter = (event: PointerEvent) => {
+      if (!media.matches || event.pointerType !== 'mouse') return;
+      bounds = undefined;
+      setIsMouseEntered(true);
+      move(event);
+    };
+    const leave = () => {
+      cancelAnimationFrame(frame); frame = 0; bounds = undefined;
+      setIsMouseEntered(false);
+      if (media.matches) { rotateX.set(0); rotateY.set(0); }
+      else { rotateX.jump(0); rotateY.jump(0); }
+    };
+    const invalidate = () => { bounds = undefined; };
+    const resize = new ResizeObserver(invalidate);
+    resize.observe(container);
+    container.addEventListener('pointerenter', enter);
+    container.addEventListener('pointermove', move, { passive: true });
+    container.addEventListener('pointerleave', leave);
+    window.addEventListener('scroll', invalidate, { passive: true });
+    media.addEventListener('change', leave);
+    return () => {
+      cancelAnimationFrame(frame); resize.disconnect();
+      container.removeEventListener('pointerenter', enter);
+      container.removeEventListener('pointermove', move);
+      container.removeEventListener('pointerleave', leave);
+      window.removeEventListener('scroll', invalidate);
+      media.removeEventListener('change', leave);
+    };
+  }, [rotateX, rotateY]);
 
   return (
     <MouseEnterContext.Provider value={[isMouseEntered, setIsMouseEntered]}>
       <div
+        ref={containerRef}
         className={cn(containerClassName)}
         style={{
           perspective: "1000px",
@@ -57,11 +92,7 @@ export const CardContainer = ({
           justifyContent: "center",
         }}
       >
-        <div
-          ref={containerRef}
-          onMouseEnter={handleMouseEnter}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
+        <motion.div
           className={cn(className)}
           style={{
             transformStyle: "preserve-3d",
@@ -69,11 +100,12 @@ export const CardContainer = ({
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
-            transition: "transform 420ms cubic-bezier(.16,1,.3,1)",
+            rotateX,
+            rotateY,
           }}
         >
           {children}
-        </div>
+        </motion.div>
       </div>
     </MouseEnterContext.Provider>
   );

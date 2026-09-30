@@ -1,0 +1,245 @@
+<div id="nucleus-cast-concept" aria-label="Nucleus member showcase motion concept">
+  <header class="nc-top"><span>NUCLEUS <span class="nc-subbrand">/ SJEC</span></span><span class="nc-kicker">THE PEOPLE · MOTION STUDY</span></header>
+  <section class="nc-stage" aria-label="Animated club member cards">
+    <div class="nc-heading"><span class="nc-kicker" data-chapter>01 / THE ATTRACTION</span><h2>Many minds.<br><em>One nucleus.</em></h2></div>
+    <div class="nc-orbits" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="nc-word" aria-hidden="true">NUCLEUS</div>
+    <div class="nc-camera" aria-hidden="true"></div>
+    <div class="nc-spotlight" aria-hidden="true"><span class="nc-kicker" data-number></span><h3 data-name></h3><p data-role></p></div>
+    <div class="nc-roster" aria-label="The Nucleus team" hidden></div>
+    <span class="nc-note">Initials stand in for member portraits</span>
+  </section>
+  <div class="nc-playback">
+    <button class="nc-play cursor-interaction" type="button" aria-label="Play the motion concept">Play sequence <span aria-hidden="true">↗</span></button>
+    <div class="nc-timeline"><label for="nc-progress"><span>Gather</span><span>Spotlight</span><span>Together</span></label><input id="nc-progress" class="cursor-interaction" type="range" min="0" max="1000" value="0" aria-label="Scrub through the showcase"></div>
+    <output class="nc-percent" for="nc-progress">0%</output>
+  </div>
+  <p class="nc-sr" aria-live="polite" data-announcement>Gather: the team cards orbit the Nucleus.</p>
+</div>
+<style>
+  #nucleus-cast-concept {
+    --nc-bg: light-dark(#edf3ed, #030603); --nc-surface: light-dark(#f9fcf8, #101b12);
+    --nc-ink: light-dark(#183d29, #c3e5c8); --nc-muted: light-dark(#4c6754, #9db5a0);
+    --nc-line: light-dark(#b9ccbb, #2b4130); --nc-wash: light-dark(#d9e9da, #172e1d);
+    --nc-shadow: light-dark(#26452c20, #00000090);
+    position: relative; width: 100%; overflow: hidden; color: var(--nc-ink); background: var(--nc-bg);
+    font: 400 14px/1.45 Arial, sans-serif; border-radius: 12px; isolation: isolate;
+  }
+  #nucleus-cast-concept * { box-sizing: border-box; }
+  #nucleus-cast-concept h2, #nucleus-cast-concept h3, #nucleus-cast-concept p { margin: 0; }
+  #nucleus-cast-concept .nc-top { height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 24px; border-bottom: 1px solid var(--nc-line); font-size: 13px; letter-spacing: .15em; }
+  #nucleus-cast-concept .nc-subbrand { color: var(--nc-muted); font-size: 11px; }
+  #nucleus-cast-concept .nc-kicker { color: var(--nc-muted); font: 400 11px/1.4 Consolas, monospace; letter-spacing: .09em; }
+  #nucleus-cast-concept .nc-stage { position: relative; height: 500px; overflow: hidden; background: radial-gradient(ellipse at 50% 55%, var(--nc-wash), transparent 70%); }
+  #nucleus-cast-concept .nc-heading { position: absolute; z-index: 5; inset: 25px 24px auto; pointer-events: none; }
+  #nucleus-cast-concept .nc-heading h2 { margin-top: 11px; font: 400 clamp(31px, 6vw, 52px)/.98 Arial, sans-serif; letter-spacing: -.065em; }
+  #nucleus-cast-concept .nc-heading em { font: italic 400 1em/.98 Georgia, serif; }
+  #nucleus-cast-concept .nc-word { position: absolute; inset: 185px 0 auto; text-align: center; color: var(--nc-line); font: 400 clamp(42px, 11vw, 88px)/1 Arial, sans-serif; letter-spacing: -.07em; pointer-events: none; }
+  #nucleus-cast-concept .nc-camera { position: absolute; inset: 0; perspective: 1000px; }
+  #nucleus-cast-concept .nc-member { position: absolute; left: 50%; top: 54%; width: 180px; height: 238px; border: 1px solid var(--nc-line); border-radius: 8px; background: var(--nc-surface); box-shadow: 0 14px 35px var(--nc-shadow); transform-origin: center; will-change: transform; overflow: hidden; }
+  #nucleus-cast-concept .nc-art { height: 169px; position: relative; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 50% 100%, var(--nc-wash), transparent 85%); border-bottom: 1px solid var(--nc-line); }
+  #nucleus-cast-concept .nc-art::before, #nucleus-cast-concept .nc-art::after { content: ''; position: absolute; width: 100px; height: 205px; border: 1px solid var(--nc-line); border-radius: 50%; transform: rotate(40deg); }
+  #nucleus-cast-concept .nc-art::after { transform: rotate(-40deg); }
+  #nucleus-cast-concept .nc-initials { z-index: 1; font: 400 65px/1 Georgia, serif; letter-spacing: -.08em; }
+  #nucleus-cast-concept .nc-index { position: absolute; top: 12px; left: 13px; color: var(--nc-muted); font: 400 11px/1 Consolas, monospace; }
+  #nucleus-cast-concept .nc-cardcopy { padding: 12px; }
+  #nucleus-cast-concept .nc-cardcopy strong { display: block; font: 400 13px/1.35 Arial, sans-serif; }
+  #nucleus-cast-concept .nc-cardcopy small { display: block; margin-top: 4px; color: var(--nc-muted); font-size: 11px; }
+  #nucleus-cast-concept .nc-orbits { position: absolute; width: 440px; height: 250px; top: 190px; left: calc(50% - 220px); pointer-events: none; }
+  #nucleus-cast-concept .nc-orbits span { position: absolute; inset: 0; border: 1px solid var(--nc-line); border-radius: 50%; transform: rotate(-18deg); }
+  #nucleus-cast-concept .nc-orbits span:nth-child(2) { inset: -25px 25px; transform: rotate(20deg); }
+  #nucleus-cast-concept .nc-orbits span:nth-child(3) { inset: -80px 110px; transform: rotate(54deg); }
+  #nucleus-cast-concept .nc-spotlight { position: absolute; z-index: 6; width: 82%; left: 9%; bottom: 42px; text-align: center; pointer-events: none; opacity: 0; }
+  #nucleus-cast-concept .nc-spotlight h3 { margin: 7px 0 5px; font: 400 clamp(24px, 5vw, 36px)/1.12 Arial, sans-serif; letter-spacing: -.045em; }
+  #nucleus-cast-concept .nc-spotlight p { color: var(--nc-muted); font-size: 13px; }
+  #nucleus-cast-concept .nc-note { position: absolute; right: 20px; bottom: 12px; font-size: 11px; color: var(--nc-muted); }
+  #nucleus-cast-concept .nc-roster { position: absolute; z-index: 7; inset: 108px 24px auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+  #nucleus-cast-concept .nc-roster[hidden] { display: none; }
+  #nucleus-cast-concept .nc-roster article { min-width: 0; min-height: 62px; padding: 9px 11px; border: 1px solid var(--nc-line); border-radius: 5px; background: var(--nc-surface); }
+  #nucleus-cast-concept .nc-roster strong { display: block; font-size: 12px; font-weight: 400; line-height: 1.35; }
+  #nucleus-cast-concept .nc-roster small { display: block; margin-top: 4px; font-size: 11px; line-height: 1.35; color: var(--nc-muted); }
+  #nucleus-cast-concept .nc-playback { display: flex; align-items: center; gap: 20px; padding: 17px 24px 19px; background: var(--nc-surface); border-top: 1px solid var(--nc-line); }
+  #nucleus-cast-concept .nc-play { flex-shrink: 0; padding: 0 14px; min-height: 44px; min-width: 145px; display: flex; gap: 15px; justify-content: space-between; align-items: center; border: 0; border-radius: 4px; background: var(--nc-ink); color: var(--nc-bg); font: 400 12px/1.3 Arial, sans-serif; }
+  #nucleus-cast-concept .nc-timeline { flex: 1; min-width: 0; }
+  #nucleus-cast-concept .nc-timeline label { display: flex; justify-content: space-between; gap: 8px; color: var(--nc-muted); font-size: 11px; }
+  #nucleus-cast-concept .nc-timeline input { display: block; width: 100%; height: 24px; padding: 0; margin: 3px 0 0; accent-color: var(--nc-ink); }
+  #nucleus-cast-concept .nc-percent { min-width: 34px; text-align: right; font: 400 11px/1 Consolas, monospace; color: var(--nc-muted); }
+  #nucleus-cast-concept .nc-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  @media(max-width: 480px) {
+    #nucleus-cast-concept .nc-top { padding-inline: 16px; font-size: 12px; }
+    #nucleus-cast-concept .nc-top > .nc-kicker { max-width: 114px; text-align: right; }
+    #nucleus-cast-concept .nc-stage { height: 510px; }
+    #nucleus-cast-concept .nc-heading { inset-inline: 16px; }
+    #nucleus-cast-concept .nc-heading h2 { font-size: 34px; }
+    #nucleus-cast-concept .nc-roster { inset-inline: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    #nucleus-cast-concept .nc-roster article { min-height: 70px; padding: 8px; }
+    #nucleus-cast-concept .nc-playback { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
+    #nucleus-cast-concept .nc-play { min-width: 132px; }
+    #nucleus-cast-concept .nc-timeline { order: 3; flex-basis: 100%; }
+    #nucleus-cast-concept .nc-percent { margin-left: auto; }
+  }
+</style>
+<script>
+(() => {
+  const root = document.getElementById('nucleus-cast-concept');
+  const camera = root.querySelector('.nc-camera');
+  const stage = root.querySelector('.nc-stage');
+  const heading = root.querySelector('.nc-heading');
+  const title = heading.querySelector('h2');
+  const chapter = root.querySelector('[data-chapter]');
+  const word = root.querySelector('.nc-word');
+  const orbits = root.querySelector('.nc-orbits');
+  const spotlight = root.querySelector('.nc-spotlight');
+  const name = root.querySelector('[data-name]');
+  const role = root.querySelector('[data-role]');
+  const number = root.querySelector('[data-number]');
+  const roster = root.querySelector('.nc-roster');
+  const announcement = root.querySelector('[data-announcement]');
+  const play = root.querySelector('.nc-play');
+  const progress = root.querySelector('#nc-progress');
+  const percent = root.querySelector('.nc-percent');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const people = [
+    ['Poorvik Kuthyala', 'President', 'PK'], ['Dinol Castelino', 'Vice President', 'DC'],
+    ['Joylin Mathias', 'Secretary', 'JM'], ['Nishanth Uday Naik', 'Plan & Strategy Lead', 'NN'],
+    ['Karthik', 'Treasurer', 'K'], ['Prajwal Gaonkar', 'Technical Lead', 'PG'],
+    ['Mohit', 'AI & ML Lead', 'M'], ['Rakshith Dsouza', 'Development Lead', 'RD'],
+    ['Navya Suvarna', 'DSA Lead', 'NS'], ['Deona Rego', 'Event Lead', 'DR'],
+    ['Sweedan Cardoza', 'Media Lead', 'SC'], ['Manvitha Lewis', 'Discipline Head', 'ML'],
+    ['Salim Pallikal', 'Member', 'SP'], ['Nikhitha Dsouza', 'Member', 'ND'],
+    ['Aisahath Saniya', 'Member', 'AS']
+  ];
+  const cards = people.map((person, i) => {
+    const card = document.createElement('div');
+    card.className = 'nc-member';
+    card.innerHTML = '<div class="nc-art"><span class="nc-index"></span><span class="nc-initials"></span></div><div class="nc-cardcopy"><strong></strong><small></small></div>';
+    card.querySelector('.nc-index').textContent = String(i + 1).padStart(2, '0');
+    card.querySelector('.nc-initials').textContent = person[2];
+    card.querySelector('strong').textContent = person[0];
+    card.querySelector('small').textContent = person[1];
+    camera.append(card);
+    const tile = document.createElement('article');
+    const tileName = document.createElement('strong');
+    const tileRole = document.createElement('small');
+    tileName.textContent = person[0]; tileRole.textContent = person[1];
+    tile.append(tileName, tileRole); roster.append(tile);
+    return card;
+  });
+  const design = { movement: 'orbit', depth: 1, duration: 36 };
+  let value = reduced.matches ? 1 : 0;
+  let playing = false, frame = 0, lastTime = 0, active = -1;
+  let width = root.clientWidth;
+  const clamp = x => Math.max(0, Math.min(1, x));
+  const ease = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+  const mix = (a, b, t) => a + (b - a) * t;
+  function save() {
+    if (window.openai?.setWidgetState) window.openai.setWidgetState({
+      modelContent: { concept: 'Nucleus cast introduction', movement: design.movement },
+      privateContent: { value, design: { ...design } }
+    }).catch(() => {});
+  }
+  function restore(saved) {
+    const state = saved?.privateContent;
+    if (typeof state?.value === 'number') value = clamp(state.value);
+    if (state?.design) {
+      if (['orbit', 'fan'].includes(state.design.movement)) design.movement = state.design.movement;
+      if (Number.isFinite(state.design.depth)) design.depth = Math.max(.5, Math.min(1.5, state.design.depth));
+      if (Number.isFinite(state.design.duration)) design.duration = Math.max(24, Math.min(48, state.design.duration));
+    }
+  }
+  function render() {
+    const compact = width < 481;
+    const gather = ease(value / .16);
+    const focus = ease((value - .13) / .1);
+    const finale = ease((value - .89) / .1);
+    const index = clamp((value - .23) / .65) * (people.length - 1);
+    const selected = Math.round(index);
+    const phase = finale > .5 ? 2 : focus > .5 ? 1 : 0;
+    stage.style.height = `${mix(compact ? 510 : 500, compact ? 755 : 530, finale)}px`;
+    heading.style.transform = `translateY(${-7 * focus}px)`;
+    title.style.opacity = String(1 - focus * (1 - finale));
+    title.style.transform = `scale(${1 - finale * .32})`;
+    title.style.transformOrigin = 'left top';
+    title.innerHTML = finale > .5 ? 'The whole nucleus.' : 'Many minds.<br><em>One nucleus.</em>';
+    chapter.textContent = ['01 / THE ATTRACTION', '02 / MEET THE MINDS', '03 / ALL TOGETHER'][phase];
+    orbits.style.transform = `rotate(${value * 100}deg) scale(${1 + focus * .35})`;
+    orbits.style.opacity = String(1 - finale);
+    word.style.opacity = String((.8 - focus * .5) * (1 - finale));
+    word.style.transform = `translateX(${Math.sin(index * .3) * -30}px) scale(${1 + focus * .25})`;
+    cards.forEach((card, i) => {
+      const angle = i / people.length * Math.PI * 2 + gather * .8;
+      const ring = i % 2 === 0 ? 1 : .8;
+      const spreadX = Math.min(width * .40, 268);
+      const orbitX = Math.cos(angle) * spreadX * ring;
+      const orbitY = Math.sin(angle) * 133 * ring + 38;
+      const delta = i - index;
+      const distance = Math.abs(delta);
+      const settle = Math.sign(delta) * Math.pow(Math.min(distance, 1), 1.65);
+      const fan = design.movement === 'fan';
+      const heroX = settle * Math.min(width * .42, 255) + Math.sign(delta) * Math.max(0, distance - 1) * 78;
+      const heroY = -31 + Math.min(distance, 3) * (fan ? 23 : 39);
+      let x = mix(orbitX * (1.3 - gather * .3), heroX, focus);
+      let y = mix(orbitY, heroY, focus);
+      let z = mix(-100 + Math.sin(angle) * 90, -Math.min(distance, 6) * 160 * design.depth, focus);
+      const scale = mix(.62, .98, focus);
+      const rotate = mix(Math.sin(angle) * 18, settle * (fan ? 24 : -15), focus);
+      const rotateY = mix(Math.cos(angle) * -25, settle * (fan ? -12 : -48) * design.depth, focus);
+      x = mix(x, ((i % 3) - 1) * 150, finale);
+      y = mix(y, (Math.floor(i / 3) - 2) * 75, finale);
+      if (reduced.matches) { x = 0; y = -30; z = 0; }
+      card.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, ${z}px) rotateY(${reduced.matches ? 0 : rotateY}deg) rotateZ(${reduced.matches ? 0 : rotate}deg) scale(${scale})`;
+      card.style.opacity = String((reduced.matches ? (i === selected ? 1 : 0) : mix(.75 + Math.sin(angle) * .2, Math.max(.08, 1 - distance * .32), focus)) * (1 - finale));
+      card.style.zIndex = String(Math.round(100 - distance * 5));
+    });
+    spotlight.style.opacity = String(focus * (1 - finale));
+    spotlight.style.transform = `translateY(${(1 - focus) * 20}px)`;
+    if (active !== selected || name.textContent === '') {
+      active = selected;
+      name.textContent = people[selected][0]; role.textContent = people[selected][1];
+      number.textContent = `${String(selected + 1).padStart(2, '0')} / ${people.length}`;
+    }
+    roster.hidden = finale < .05;
+    roster.style.opacity = String(finale);
+    Array.from(roster.children).forEach((tile, i) => {
+      tile.style.transform = `translateY(${(1 - finale) * (25 + i * 5)}px)`;
+    });
+    progress.value = String(Math.round(value * 1000));
+    progress.setAttribute('aria-valuetext', `${Math.round(value * 100)} percent, ${['Gather', 'Spotlight: ' + people[selected][0], 'Together'][phase]}`);
+    percent.textContent = `${Math.round(value * 100)}%`;
+    play.innerHTML = playing ? 'Pause <span aria-hidden="true">Ⅱ</span>' : value > .999 ? 'Replay <span aria-hidden="true">↗</span>' : 'Play sequence <span aria-hidden="true">↗</span>';
+    play.setAttribute('aria-label', playing ? 'Pause the motion concept' : value > .999 ? 'Replay the motion concept' : 'Play the motion concept');
+  }
+  function announce() {
+    announcement.textContent = value > .94 ? 'Together: all 15 Nucleus members.' : value > .18 ? `${people[active][0]}, ${people[active][1]}.` : 'Gather: the team cards orbit the Nucleus.';
+  }
+  function stop() { playing = false; cancelAnimationFrame(frame); frame = 0; render(); }
+  function tick(time) {
+    if (!playing) return;
+    value = clamp(value + Math.min(time - lastTime, 80) / (design.duration * 1000));
+    lastTime = time; render();
+    if (value >= 1) { stop(); announce(); save(); }
+    else frame = requestAnimationFrame(tick);
+  }
+  play.addEventListener('click', () => {
+    if (playing) { stop(); announce(); save(); return; }
+    if (value >= 1) value = 0;
+    playing = true; lastTime = performance.now(); render(); frame = requestAnimationFrame(tick);
+  });
+  progress.addEventListener('input', () => { const nextValue = Number(progress.value) / 1000; stop(); value = nextValue; render(); });
+  progress.addEventListener('change', () => { announce(); save(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+  reduced.addEventListener('change', () => { stop(); if (reduced.matches) value = 1; render(); });
+  new ResizeObserver(entries => { width = entries[0].contentRect.width; render(); }).observe(root);
+  restore(window.openai?.widgetState);
+  window.addEventListener('openai:set_globals', event => {
+    if (event.detail?.globals?.widgetState) { stop(); restore(event.detail.globals.widgetState); render(); }
+  });
+  render();
+  if (globalThis.Tweak) {
+    const tweak = new Tweak({ container: root, onChange: () => { render(); save(); } });
+    tweak.addSelect(design, 'movement', { label: 'Card movement', options: [{ label: 'Orbital sweep', value: 'orbit' }, { label: 'Cinematic fan', value: 'fan' }] });
+    tweak.addSlider(design, 'depth', { label: 'Depth', min: .5, max: 1.5, step: .1 });
+    tweak.addSlider(design, 'duration', { label: 'Sequence duration', min: 24, max: 48, step: 2, unit: 's' });
+  }
+})();
+</script>
