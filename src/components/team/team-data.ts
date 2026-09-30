@@ -1,91 +1,182 @@
 import type { ClubMember, CoreMember } from './types';
 
-// Real club directory, sourced from shared/public-data.json.
-//
-// No member photographs exist in the codebase, so `image` is intentionally
-// unset everywhere and the UI falls back to initials (see MemberPhoto). Add a
-// photo path per person as real portraits become available.
-//
-// The twelve core seats mirror shared/public-data.json exactly. There is no
-// System Design Lead in the source data, so that seat is left out rather than
-// filled with a placeholder.
 export const exampleCore: CoreMember[] = [
   {
     id: 'poorvik',
     name: 'Poorvik Kuthyala',
     role: 'President',
-    bio: 'Helps shape the direction of Nucleus, connects the team around a shared purpose, and makes space for ideas to become meaningful work.',
+    image: '/team/Poorvik.avif',
+    bio: 'turning coffee into algorithms',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/poorvik-kuthyala',
+      github: 'https://github.com/poorvikkg',
+      leetcode: 'https://leetcode.com/u/Poorvikkg/',
+      gfg: 'https://share.google/1Ql7r13HdAmNspLeY',
+    },
   },
   {
     id: 'dinol',
     name: 'Dinol Castelino',
     role: 'Vice President',
-    bio: 'Connects people and plans across the club, supports the core team, and helps keep our shared goals moving forward.',
+    image: '/team/Dinol.avif',
+    bio: 'Running on caffeine, GPUs, and La Pasión.',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/dinol-castelino-57053631a',
+      github: 'https://GitHub.com/Dinol-ino',
+    },
   },
   {
     id: 'joylin',
     name: 'Joylin Mathias',
     role: 'Secretary',
-    bio: 'Keeps the club connected through clear communication, organised records, and the coordination that helps each initiative run smoothly.',
+    image: '/team/Joylin.avif',
+    bio: 'Keeping the team in sync while ideas find their rhythm',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/joylin-mathias',
+      github: 'https://github.com/joylinmhs',
+    },
   },
   {
     id: 'prajwal',
     name: 'Prajwal Gaonkar',
     role: 'Tech Lead',
-    bio: 'Guides the technical direction of our work, brings builders together, and helps the team turn ambitious ideas into practical projects.',
+    image: '/team/Prajwal.avif',
+    bio: 'Exploring questionable decisions with epsilon=1',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/prajwal-gaonkar-a57586195',
+      github: 'https://github.com/OP-Prajwal',
+      leetcode: 'https://leetcode.com/u/Prajwal_S_07/',
+    },
   },
   {
     id: 'mohit',
     name: 'Mohit',
     role: 'AI & ML Lead',
-    bio: 'Helps our AI and machine learning community explore models, ask better questions, and learn through experiments and shared discovery.',
+    image: '/team/Mohit.avif',
+    bio: 'May your gradients never vanish',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/mohit---7838b631a',
+      github: 'https://github.com/mohit782005',
+      kaggle: 'https://www.kaggle.com/mohit78241',
+    },
   },
   {
     id: 'rakshith',
     name: 'Rakshith Dsouza',
     role: 'Dev Lead',
-    bio: 'Connects design with development, guides collaborative builds, and helps members create useful digital experiences from the ground up.',
+    image: '/team/Rakshith.avif',
+    bio: 'Nothing really...',
+    socials: {
+      github: 'https://github.com/Knight-eGithub',
+      leetcode: 'https://leetcode.com/u/Knight-eLeetCode',
+      linkedin: 'https://www.linkedin.com/in/rakshith-d-souza-575b34335',
+    },
   },
   {
     id: 'navya',
     name: 'Navya Suvarna',
     role: 'DSA Lead',
-    bio: 'Helps members strengthen their problem-solving foundations through algorithms, peer practice, and conversations about how and why a solution works.',
+    image: '/team/Navya.avif',
+    bio: 'Outrunning time limits daily.',
+    socials: {
+      github: 'https://github.com/navya-y-suvarna',
+      leetcode: 'https://leetcode.com/u/Navya_Suvarna/',
+      gfg: 'https://www.geeksforgeeks.org/profile/navyasuvzo4b?tab=activity',
+      codeforces: 'https://codeforces.com/profile/navyasuvarna',
+      linkedin: 'https://www.linkedin.com/in/navya-y-suvarna/',
+    },
   },
   {
     id: 'manvitha',
     name: 'Manvitha Lewis',
     role: 'Discipline Head',
-    bio: 'Helps maintain a respectful, welcoming environment and supports the shared standards that allow every member to learn and contribute.',
+    image: '/team/Manvitha.avif',
+    bio: 'Thinking like a user, designing like a creator.',
+    socials: {
+      linkedin: 'https://in.linkedin.com/in/manvitha-lewis',
+      github: 'https://github.com/manvithalewis',
+    },
   },
   {
     id: 'karthik',
     name: 'Karthik',
     role: 'Treasurer',
-    bio: "Looks after the club's finances, helps plan resources responsibly, and supports the decisions that make our activities possible.",
+    image: '/team/Karthik.avif',
+    bio: 'Trusted To Execute, No Cap',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/karthik-ㅤ-4bab052a9',
+      github: 'https://github.com/karthik17-hub',
+    },
   },
   {
     id: 'deona',
     name: 'Deona Rego',
     role: 'Event Lead',
-    bio: 'Brings people together through club experiences, coordinating the details that turn a shared idea into a gathering of curious minds.',
+    image: '/team/Deona.avif',
+    bio: "Give me a crowd, a mic and a little chaos- I'll turn it into an event ",
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/deona-rego-0b2002323',
+      github: 'https://github.com/deonahub',
+    },
   },
   {
     id: 'nishanth',
     name: 'Nishanth Uday Naik',
     role: 'Planning & Strategy Lead',
-    bio: "Connects today's ideas with tomorrow's opportunities, shapes action plans, and helps the team move towards clear, achievable goals.",
+    image: '/team/Nishanth1.avif',
+    bio: 'Learning AI, Leading Strategy',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/nishanth-naik21',
+      github: 'https://github.com/Nishanthnaik21',
+    },
   },
   {
     id: 'sweedan',
     name: 'Sweedan Cardoza',
     role: 'Media Lead',
-    bio: 'Helps tell the Nucleus story through visuals, updates, and the moments we share, connecting what happens inside the club with the wider community.',
+    image: '/team/Sweeden.avif',
+    bio: 'Ballin in and off the field',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/sweedan23',
+    },
   },
 ];
 
 export const exampleMembers: ClubMember[] = [
-  { id: 'salim', name: 'Salim Pallikal', role: 'Member', team: 'Community' },
-  { id: 'nikhitha', name: 'Nikhitha Dsouza', role: 'Member', team: 'Community' },
-  { id: 'saniya', name: 'Aisahath Saniya', role: 'Member', team: 'Community' },
+  {
+    id: 'salim',
+    name: 'Salim Pallikal',
+    role: 'Member',
+    team: 'Community',
+    image: '/team/Salim.avif',
+    bio: 'inspired to innovate',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/mahammad-salim',
+      github: 'https://github.com/mahammad-salim7899',
+    },
+  },
+  {
+    id: 'nikhitha',
+    name: 'Nikhitha Dsouza',
+    role: 'Member',
+    team: 'Community',
+    image: '/team/Nikhitha.avif',
+    bio: 'Debugging, one existential crisis at a time.',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/nikhitha-risha-dsouza',
+      github: 'https://github.com/nikhrd',
+    },
+  },
+  {
+    id: 'saniya',
+    name: 'Aisahath Saniya',
+    role: 'Member',
+    team: 'Community',
+    image: '/team/Saniya.avif',
+    bio: '90% coffee, 10% code.',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/ayesha-saniya-194b92294',
+      github: 'https://github.com/Ayeshasaniyaaaa',
+    },
+  },
 ];

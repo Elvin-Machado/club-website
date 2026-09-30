@@ -4,7 +4,7 @@ export interface CoreMember {
   role: string;
   image?: string;
   bio?: string;
-  socials?: { twitter?: string; linkedin?: string; instagram?: string; email?: string };
+  socials?: Record<string, string | undefined>;
 }
 
 export interface ClubMember {
@@ -14,7 +14,7 @@ export interface ClubMember {
   team: string;
   image?: string;
   bio?: string;
-  socials?: { twitter?: string; linkedin?: string; instagram?: string; email?: string };
+  socials?: Record<string, string | undefined>;
 }
 
 export interface TeamShowcaseProps {

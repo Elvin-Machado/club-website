@@ -33,8 +33,9 @@ test('team accepts common role aliases, shared roles, and an updated roster', ()
 
 test('introductions prefer saved biographies and fall back without inventing personal achievements', () => {
   const member = seed.team.find(member => member.id === 'salim');
-  assert.match(memberIntroduction(member), /Salim Pallikal/);
+  assert.equal(memberIntroduction(member), member.bio);
+  assert.match(memberIntroduction({ ...member, bio: '' }), /Salim Pallikal/);
   assert.equal(memberIntroduction({ ...member, bio: '  I enjoy building tools for campus.  ' }), 'I enjoy building tools for campus.');
   assert.match(memberIntroduction({ ...member, bio: ' ' }), /Nucleus community/);
-  assert.match(memberIntroduction(seed.team.find(member => member.id === 'deona')), /Event Lead/);
+  assert.match(memberIntroduction({ ...seed.team.find(member => member.id === 'deona'), bio: '' }), /Event Lead/);
 });

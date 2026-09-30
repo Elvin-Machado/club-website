@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import TeamShowcase from '../../components/team/TeamShowcase';
+import NextTeamNavigation from '../../components/team/NextTeamNavigation';
 import { exampleCore, exampleMembers } from '../../components/team/team-data';
 import { alumniMembers, currentTeam } from '../../components/team/alumni-data';
 
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 // Alumni are filtered out automatically so they never appear in the active orbit.
 export default function TeamPage() {
   const { core, members } = currentTeam(exampleCore, exampleMembers, alumniMembers);
-  return <TeamShowcase clubName="Nucleus" core={core} members={members} />;
+  return <NextTeamNavigation><TeamShowcase clubName="Nucleus" core={core} members={members} /></NextTeamNavigation>;
 }

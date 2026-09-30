@@ -114,7 +114,7 @@ test('production server-renders the landing and club routes, escapes data, and h
       const peopleHtml = await peopleResponse.text();
       assert.ok(peopleHtml.includes(heading));
       assert.match(peopleHtml, /team-header/);
-      if (route !== '/team') assert.doesNotMatch(peopleHtml, /class="constellation-section"/);
+      if (route !== '/team') assert.doesNotMatch(peopleHtml, /class="core-deck-section"/);
       if (route === '/members') assert.match(peopleHtml, /Salim Pallikal/);
     }
     assert.ok(!html.includes('</script><script>alert(1)</script>')); assert.match(html, /id="nucleus-data"/);

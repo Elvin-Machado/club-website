@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import MembersShowcase from '../../components/team/MembersShowcase';
+import NextTeamNavigation from '../../components/team/NextTeamNavigation';
 import { exampleCore, exampleMembers } from '../../components/team/team-data';
 import { alumniMembers, currentTeam } from '../../components/team/alumni-data';
 
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 
 export default function MembersPage() {
   const { members } = currentTeam(exampleCore, exampleMembers, alumniMembers);
-  return <MembersShowcase clubName="Nucleus" members={members} />;
+  return <NextTeamNavigation><MembersShowcase clubName="Nucleus" members={members} /></NextTeamNavigation>;
 }

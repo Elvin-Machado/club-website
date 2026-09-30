@@ -30,6 +30,6 @@ export default function MemberCard({ member, index, onSelect, reducedMotion }: {
       {'higherStudies' in member && member.higherStudies && <span className="gallery-card-detail">{member.higherStudies}</span>}
       {member.bio && <span className="gallery-card-bio">{member.bio}</span>}
     </span>
-    <span className="gallery-card-link">View profile <ArrowUpRight size={14} /></span>
+    <span className="gallery-card-arrow" aria-hidden="true"><ArrowUpRight size={16} /></span>
   </motion.button>;
 }

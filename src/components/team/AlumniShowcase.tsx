@@ -28,9 +28,9 @@ export default function AlumniShowcase({ clubName }: { clubName: string }) {
     setProfileVisible(false);
   }, []);
 
-  return <TeamShell clubName={clubName} cta={{ href: '/team', label: 'Back to The People' }} skipTarget="alumni">
+  return <TeamShell clubName={clubName} cta={{ href: '/team#navigation-cards', label: 'Back to The People' }} skipTarget="alumni">
     <main className="team-destination" data-reduced-motion={reducedMotion ? 'true' : undefined}>
-      <Link href="/team" className="team-back-link"><ArrowLeft size={16} aria-hidden="true" /> Back to The People</Link>
+      <Link href="/team#navigation-cards" className="team-back-link"><ArrowLeft size={16} aria-hidden="true" /> Back to The People</Link>
       <AlumniSection members={alumniMembers} reducedMotion={reducedMotion} onSelect={select} asPrimary />
 
       <AnimatePresence>{selected && profileVisible && <MemberProfileOverlay key={selected.id} member={selected} index={alumniMembers.findIndex(member => member.id === selected.id)} total={alumniMembers.length} group="ALUMNI" clubName={clubName} reducedMotion={reducedMotion} returnFocus={returnFocus.current} onClose={close} />}</AnimatePresence>

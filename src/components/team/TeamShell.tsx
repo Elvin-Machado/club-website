@@ -1,22 +1,22 @@
 'use client';
 
-import NextLink from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { lazy, Suspense, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import SceneBoundary from './SceneBoundary';
 import { useSceneCapabilities } from './useSceneCapabilities';
-import { TeamLink as Link, TeamNavigationContext, useTeamNavigation, type TeamNavigation } from './TeamNavigation';
+import { TeamLink as Link, useTeamNavigation } from './TeamNavigation';
 
 const GalaxyScene = lazy(() => import('./GalaxyScene'));
 
 // Top navigation strictly retains the primary website pages.
 // Members and Alumni are destination pages accessible via the navigation cards on /team.
 const pageLinks: [string, string][] = [
+  ['Home', '/'],
   ['The idea', '/about'],
   ['Experiences', '/events'],
   ['Our work', '/projects'],
   ['The people', '/team'],
+  ['Contact', '/#contact'],
 ];
 
 interface TeamShellProps {
@@ -26,19 +26,7 @@ interface TeamShellProps {
   skipTarget: string;
 }
 
-export default function TeamShell(props: TeamShellProps) {
-  const navigation = useContext(TeamNavigationContext);
-  return navigation ? <ShellContent {...props} /> : <NextShell {...props} />;
-}
-
-function NextShell(props: TeamShellProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const navigation = useMemo<TeamNavigation>(() => ({ pathname, push: router.push, prefetch: router.prefetch, Link: NextLink }), [pathname, router]);
-  return <TeamNavigationContext.Provider value={navigation}><ShellContent {...props} /></TeamNavigationContext.Provider>;
-}
-
-function ShellContent({ clubName, children, cta, skipTarget }: TeamShellProps) {
+export default function TeamShell({ clubName, children, cta, skipTarget }: TeamShellProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [starsReady, setStarsReady] = useState(false);
   const { pathname } = useTeamNavigation();
@@ -63,7 +51,7 @@ function ShellContent({ clubName, children, cta, skipTarget }: TeamShellProps) {
         <div className="galaxy-grain" />
       </div>
       <a className="team-skip-link" href={`#${skipTarget}`}>
-        Skip to {skipTarget === 'constellation' ? 'the constellation' : 'the content'}
+        Skip to {skipTarget === 'core-team-deck' || skipTarget === 'constellation' ? 'the core team deck' : 'the content'}
       </a>
       <header className="team-header">
         <Link className="team-brand" href="/" aria-label={`${clubName} home`}>
@@ -85,6 +73,7 @@ function ShellContent({ clubName, children, cta, skipTarget }: TeamShellProps) {
               {label}
             </Link>
           ))}
+          {cta && <Link className="team-mobile-cta" href={cta.href} onClick={() => setMenuOpen(false)}>{cta.label}<ArrowUpRight size={15} aria-hidden="true" /></Link>}
         </nav>
         {cta && (
           <Link className="team-header-link" href={cta.href}>
