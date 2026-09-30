@@ -48,6 +48,7 @@ export default function GalaxyScene(props: { mobile: boolean; lowPower: boolean;
   }, []);
   if (lost) return null;
   return <Canvas dpr={[1, props.mobile || props.lowPower ? 1 : 1.5]} camera={{ position: [0, 0, 8], fov: 55 }} gl={{ alpha: true, antialias: false, powerPreference: 'low-power' }} frameloop={active ? 'always' : 'never'} onCreated={({ gl }) => {
+    gl.domElement.setAttribute('aria-hidden', 'true');
     props.onReady?.(true);
     gl.domElement.addEventListener('webglcontextlost', () => { setLost(true); props.onReady?.(false); }, { once: true });
   }}>

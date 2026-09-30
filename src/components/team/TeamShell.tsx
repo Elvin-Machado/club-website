@@ -54,8 +54,8 @@ export default function TeamShell({ clubName, children, cta, skipTarget }: TeamS
         Skip to {skipTarget === 'core-team-deck' || skipTarget === 'constellation' ? 'the core team deck' : 'the content'}
       </a>
       <header className="team-header">
-        <Link className="team-brand" href="/" aria-label={`${clubName} home`}>
-          <img src="/brain-mark.svg" width={33} height={33} alt="" />
+        <Link className="team-brand" href="/" aria-label={`${clubName} SJEC · MANGALURU home`}>
+          <img src="/brain-mark.svg" width={33} height={33} alt="" aria-hidden="true" />
           <span>
             {clubName}
             <small>SJEC · MANGALURU</small>
@@ -77,7 +77,7 @@ export default function TeamShell({ clubName, children, cta, skipTarget }: TeamS
         </nav>
         {cta && (
           <Link className="team-header-link" href={cta.href}>
-            {cta.label} <ArrowUpRight size={15} />
+            {cta.label} <ArrowUpRight size={15} aria-hidden="true" />
           </Link>
         )}
         <button
@@ -87,7 +87,7 @@ export default function TeamShell({ clubName, children, cta, skipTarget }: TeamS
           aria-controls="team-navigation"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          {menuOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
         </button>
       </header>
       {children}

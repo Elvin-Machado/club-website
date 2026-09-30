@@ -17,14 +17,14 @@ function CoreMemberCard({ member, index, total, onSelect }: {
 }) {
   return <button type="button" className="core-card-surface-full"
     onClick={() => onSelect(member)}
-    aria-label={`View ${member.name}, ${member.role}`} aria-haspopup="dialog" data-member-id={member.id}>
+    aria-label={`${member.name}, ${member.role} — NUCLEUS CORE TEAM`} aria-haspopup="dialog" data-member-id={member.id}>
     <span className="core-card-photo-area" aria-hidden="true">
       <MemberPhoto src={member.image} name={member.name} sizes="(max-width: 767px) 80vw, 400px" priority={index === 0} />
       <span className="core-card-full-overlay" />
       <span className="core-card-badge">{String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</span>
     </span>
     <span className="core-card-bottom-content">
-      <span className="team-kicker"><span className="team-signal" />NUCLEUS CORE TEAM</span>
+      <span className="team-kicker"><span className="team-signal" aria-hidden="true" />NUCLEUS CORE TEAM</span>
       <span className="core-card-name">{member.name}</span>
       <span className="core-card-role">{member.role}</span>
     </span>
@@ -49,12 +49,12 @@ function ArchedFanMemberCard({ member, index, total, progress, onSelect }: {
   const scale = useTransform(offset, value => Math.max(0.76, 1 - Math.abs(value) * 0.1));
   const opacity = useTransform(offset, value => Math.max(0, 1 - Math.abs(value) * 0.32));
   const zIndex = useTransform(offset, value => Math.round(100 - Math.abs(value) * 10));
-  const visibility = useTransform(opacity, value => value > 0.05 ? 'visible' : 'hidden');
-  const pointerEvents = useTransform(opacity, value => value > 0.05 ? 'auto' : 'none');
+  const visibility = useTransform(opacity, value => value > 0.01 ? 'visible' : 'hidden');
+  const pointerEvents = useTransform(opacity, value => value > 0.01 ? 'auto' : 'none');
 
-  return <motion.div className="core-card-wrapper" style={{ rotate, x, y, scale, opacity, zIndex, visibility, pointerEvents }}>
+  return <motion.li className="core-card-wrapper" style={{ rotate, x, y, scale, opacity, zIndex, visibility, pointerEvents }}>
     <CoreMemberCard member={member} index={index} total={total} onSelect={onSelect} />
-  </motion.div>;
+  </motion.li>;
 }
 
 function AnimatedCoreDeck({ core, onSelect }: Omit<CoreDeckProps, 'reducedMotion'>) {
@@ -70,12 +70,12 @@ function AnimatedCoreDeck({ core, onSelect }: Omit<CoreDeckProps, 'reducedMotion
         <h1 id="core-deck-heading" className="team-kicker"><span className="team-signal" />The people / Core team</h1>
         <span className="core-deck-scroll-hint">Scroll to explore <ChevronDown size={14} aria-hidden="true" /></span>
       </div>
-      <div className="core-deck-viewport">
+      <ul className="core-deck-viewport">
         {core.map((member, index) => <ArchedFanMemberCard key={member.id} member={member} index={index}
           total={core.length} progress={progress} onSelect={onSelect} />)}
-      </div>
+      </ul>
       <div className="core-deck-logo-strip">
-        <img src="/NucleusLogo_transparent.png" alt="" className="core-deck-logo-img" />
+        <img src="/NucleusLogo_transparent.png" alt="" className="core-deck-logo-img" aria-hidden="true" />
         <p className="core-deck-tagline">Different minds. One Nucleus.</p>
       </div>
     </div>
@@ -87,7 +87,7 @@ export default function CoreDeck({ core, onSelect, reducedMotion }: CoreDeckProp
 
   return <section id="core-team-deck" className="core-deck-reduced" aria-labelledby="core-deck-heading" tabIndex={-1}>
     <div className="core-deck-heading-reduced"><span className="team-kicker">NUCLEUS CORE TEAM</span><h1 id="core-deck-heading">The people behind Nucleus.</h1></div>
-    <div className="core-deck-list-reduced">{core.map((member, index) => <CoreMemberCard key={member.id}
-      member={member} index={index} total={core.length} onSelect={onSelect} />)}</div>
+    <ul className="core-deck-list-reduced">{core.map((member, index) => <li key={member.id}><CoreMemberCard
+      member={member} index={index} total={core.length} onSelect={onSelect} /></li>)}</ul>
   </section>;
 }

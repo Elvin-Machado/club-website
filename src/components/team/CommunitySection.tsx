@@ -14,8 +14,8 @@ export default function CommunitySection({ members, onSelect, reducedMotion }: {
       </div>
       <span className="team-kicker">{String(members.length).padStart(2, '0')} MEMBERS</span>
     </div>
-    {members.length ? <div className="gallery-grid">
-      {members.map((member, index) => <MemberCard key={member.id} member={member} index={index} onSelect={() => onSelect(member)} reducedMotion={reducedMotion} />)}
-    </div> : <div className="alumni-empty"><p>Our member directory will be updated soon.</p></div>}
+    {members.length ? <ul className="gallery-grid">
+      {members.map((member, index) => <li key={member.id}><MemberCard member={member} index={index} onSelect={() => onSelect(member)} reducedMotion={reducedMotion} /></li>)}
+    </ul> : <div className="alumni-empty"><p>Our member directory will be updated soon.</p></div>}
   </section>;
 }

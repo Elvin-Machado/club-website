@@ -7,6 +7,14 @@ import { alumniMembers, currentTeam } from '../../components/team/alumni-data';
 export const metadata: Metadata = {
   title: 'The people',
   description: 'Meet the core team at the centre of NUCLEUS, then explore our current members and alumni.',
+  alternates: {
+    canonical: '/team',
+  },
+  openGraph: {
+    title: 'The people | Nucleus SJEC',
+    description: 'Meet the core team at the centre of NUCLEUS, then explore our current members and alumni.',
+    url: '/team',
+  },
 };
 
 // Real club directory, sourced from shared/public-data.json:

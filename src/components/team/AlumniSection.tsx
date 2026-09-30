@@ -17,8 +17,8 @@ export default function AlumniSection({ members, onSelect, reducedMotion, asPrim
         <p className="gallery-description">Celebrating the people who helped shape NUCLEUS, and the paths they have taken since.</p>
       </div>
     </div>
-    {members.length ? <div className="gallery-grid">
-      {members.map((member, index) => <MemberCard key={member.id} member={member} index={index} onSelect={() => onSelect(member)} reducedMotion={reducedMotion} />)}
-    </div> : <div className="alumni-empty"><GraduationCap size={28} strokeWidth={1} aria-hidden="true" /><p>Our alumni stories are coming soon.</p></div>}
+    {members.length ? <ul className="gallery-grid">
+      {members.map((member, index) => <li key={member.id}><MemberCard member={member} index={index} onSelect={() => onSelect(member)} reducedMotion={reducedMotion} /></li>)}
+    </ul> : <div className="alumni-empty"><GraduationCap size={28} strokeWidth={1} aria-hidden="true" /><p>Our alumni stories are coming soon.</p></div>}
   </section>;
 }

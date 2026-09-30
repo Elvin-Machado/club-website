@@ -18,6 +18,7 @@ export default function TeamOrbit() {
         const THREE = await import('three');
         if (disposed || preference.matches) return;
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+        renderer.domElement.setAttribute('aria-hidden', 'true');
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
         renderer.setClearColor(0x080d12, 0);
         element.appendChild(renderer.domElement);

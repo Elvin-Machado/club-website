@@ -19,7 +19,7 @@ export default function MemberCard({ member, index, onSelect, reducedMotion }: {
     initial={reducedMotion ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: reducedMotion ? 0 : 0.4, delay: reducedMotion ? 0 : Math.min(index * 0.04, 0.24) }}
-    onClick={onSelect} aria-label={`View ${member.name}, ${member.role}`} aria-haspopup="dialog">
+    onClick={onSelect} aria-label={`${member.name}, ${member.role}`} aria-haspopup="dialog">
     <span className="gallery-card-portrait" aria-hidden="true"><MemberPhoto src={member.image} name={member.name} sizes="(max-width: 500px) 80vw, (max-width: 767px) 40vw, 240px" /></span>
     <span className="gallery-card-info">
       <span className="gallery-card-name">{member.name}</span>
@@ -30,6 +30,6 @@ export default function MemberCard({ member, index, onSelect, reducedMotion }: {
       {'higherStudies' in member && member.higherStudies && <span className="gallery-card-detail">{member.higherStudies}</span>}
       {member.bio && <span className="gallery-card-bio">{member.bio}</span>}
     </span>
-    <span className="gallery-card-arrow" aria-hidden="true"><ArrowUpRight size={16} /></span>
+    <span className="gallery-card-arrow" aria-hidden="true"><ArrowUpRight size={16} aria-hidden="true" /></span>
   </motion.button>;
 }
